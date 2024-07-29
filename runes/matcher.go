@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 	us "github.com/PlayerR9/lib_units/slices"
 )
 
@@ -46,12 +46,12 @@ func (wm *WordMatcher) AddWord(word string) error {
 		return err
 	}
 
-	uc.Assert(len(chars) > 0, "chars is empty")
+	luc.Assert(len(chars) > 0, "chars is empty")
 
 	var indices []int
 
 	for i, w := range wm.words {
-		uc.Assert(len(w) > 0, "word is empty")
+		luc.Assert(len(w) > 0, "word is empty")
 
 		if len(w) == len(chars) && w[0] == chars[0] {
 			indices = append(indices, i)
@@ -86,7 +86,7 @@ func (wm *WordMatcher) AddWord(word string) error {
 //   - *common.ErrAt: If the input stream is not a valid UTF-8 stream.
 func (wm *WordMatcher) Match(is CharStream) (string, error) {
 	if is == nil {
-		return "", uc.NewErrNilParameter("is")
+		return "", luc.NewErrNilParameter("is")
 	}
 
 	indices := make([]int, 0, len(wm.words))
@@ -111,7 +111,7 @@ func (wm *WordMatcher) Match(is CharStream) (string, error) {
 			size := utf8.RuneCountInString(word)
 			for i := size; i < next_count; i++ {
 				ok := is.Refuse()
-				uc.AssertOk(ok, "is.Refuse()")
+				luc.AssertOk(ok, "is.Refuse()")
 			}
 
 			if err != nil {
@@ -128,7 +128,7 @@ func (wm *WordMatcher) Match(is CharStream) (string, error) {
 			size := utf8.RuneCountInString(word)
 			for i := size; i < next_count; i++ {
 				ok := is.Refuse()
-				uc.AssertOk(ok, "is.Refuse()")
+				luc.AssertOk(ok, "is.Refuse()")
 			}
 
 			if err != nil {
@@ -180,7 +180,7 @@ type matcher struct {
 // Returns:
 //   - bool: True if the matching process cannot continue. False otherwise.
 func (m *matcher) match(char rune) bool {
-	uc.Assert(len(m.indices) > 0, "m.indices is empty")
+	luc.Assert(len(m.indices) > 0, "m.indices is empty")
 
 	var top int
 
@@ -188,7 +188,7 @@ func (m *matcher) match(char rune) bool {
 		idx := m.indices[i]
 
 		word, ok := m.wm.get_word_at(idx)
-		uc.AssertOk(ok, "wm.get_word_at(%d)", idx)
+		luc.AssertOk(ok, "wm.get_word_at(%d)", idx)
 
 		if m.pos >= len(word) || word[m.pos] == char {
 			m.indices[top] = idx
@@ -219,7 +219,7 @@ func (m *matcher) get_sol() (string, error) {
 		// Try with the words that were not discarded yet.
 		for _, idx := range m.indices {
 			word, ok := m.wm.get_word_at(idx)
-			uc.AssertOk(ok, "wm.get_word_at(%d)", idx)
+			luc.AssertOk(ok, "wm.get_word_at(%d)", idx)
 
 			if len(word) <= m.pos {
 				indices = append(indices, idx)
@@ -242,7 +242,7 @@ func (m *matcher) get_sol() (string, error) {
 
 	for _, idx := range indices {
 		word, ok := m.wm.get_word_at(idx)
-		uc.AssertOk(ok, "wm.get_word_at(%d)", idx)
+		luc.AssertOk(ok, "wm.get_word_at(%d)", idx)
 
 		if len(max_idx) == 0 || len(word) > max_len {
 			max_len = len(word)
@@ -257,7 +257,7 @@ func (m *matcher) get_sol() (string, error) {
 
 		for _, idx := range max_idx {
 			word, ok := m.wm.get_word_at(idx)
-			uc.AssertOk(ok, "wm.get_word_at(%d)", idx)
+			luc.AssertOk(ok, "wm.get_word_at(%d)", idx)
 
 			values = append(values, string(word))
 		}
@@ -266,7 +266,7 @@ func (m *matcher) get_sol() (string, error) {
 	}
 
 	word, ok := m.wm.get_word_at(max_idx[0])
-	uc.AssertOk(ok, "wm.get_word_at(%d)", max_idx[0])
+	luc.AssertOk(ok, "wm.get_word_at(%d)", max_idx[0])
 
 	return string(word), nil
 }
@@ -285,9 +285,9 @@ func (m *matcher) get_sol() (string, error) {
 //   - *common.ErrInvalidParameter: If the input stream is nil or the input characters are empty.
 func MultiMatcher(chars []rune, stream CharStream) (string, error) {
 	if stream == nil {
-		return "", uc.NewErrNilParameter("stream")
+		return "", luc.NewErrNilParameter("stream")
 	} else if len(chars) == 0 {
-		return "", uc.NewErrInvalidParameter("chars", uc.NewErrEmpty(chars))
+		return "", luc.NewErrInvalidParameter("chars", luc.NewErrEmpty(chars))
 	}
 
 	var builder strings.Builder
@@ -298,7 +298,7 @@ func MultiMatcher(chars []rune, stream CharStream) (string, error) {
 		if !ok {
 			for size > 0 {
 				ok := stream.Refuse()
-				uc.Assert(ok, "stream.Refuse()")
+				luc.Assert(ok, "stream.Refuse()")
 			}
 
 			return "", fmt.Errorf("expected '%c', got nothing instead", c)
@@ -309,7 +309,7 @@ func MultiMatcher(chars []rune, stream CharStream) (string, error) {
 		if char != c {
 			for size > 0 {
 				ok := stream.Refuse()
-				uc.Assert(ok, "stream.Refuse()")
+				luc.Assert(ok, "stream.Refuse()")
 			}
 
 			return "", fmt.Errorf("expected '%c', got '%c' instead", c, char)

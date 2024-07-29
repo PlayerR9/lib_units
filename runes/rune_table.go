@@ -3,7 +3,7 @@ package runes
 import (
 	"strings"
 
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 )
 
 // RuneTable is a table of runes.
@@ -38,7 +38,7 @@ func NewRuneTable(lines []string) (*RuneTable, error) {
 	for i, line := range lines {
 		row, err := StringToUtf8(line)
 		if err != nil {
-			return nil, uc.NewErrAt(i+1, "line", err)
+			return nil, luc.NewErrAt(i+1, "line", err)
 		}
 
 		table = append(table, row)

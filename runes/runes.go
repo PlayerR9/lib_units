@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 )
 
 // BytesToUtf8 is a function that converts bytes to runes.
@@ -211,7 +211,7 @@ func IndicesOf(data []byte, sep []byte, exclude_sep bool) []int {
 //   - err: Any error that occurred while searching for the tokens.
 //
 // Errors:
-//   - *uc.ErrInvalidParameter: If the openingToken or closingToken is an
+//   - *luc.ErrInvalidParameter: If the openingToken or closingToken is an
 //     empty string.
 //   - *ErrTokenNotFound: If the opening or closing token is not found in the
 //     content.
@@ -465,7 +465,7 @@ func NewLevenshteinTable(words ...string) (*LavenshteinTable, error) {
 	for i, word := range words {
 		err := lt.AddWord(word)
 		if err != nil {
-			return nil, uc.NewErrAt(i+1, word, err)
+			return nil, luc.NewErrAt(i+1, word, err)
 		}
 	}
 
@@ -506,7 +506,7 @@ func (lt *LavenshteinTable) AddWord(word string) error {
 //   - *ErrNoClosestWordFound: If no closest word is found.
 func (lt *LavenshteinTable) GetClosest(target []rune) (string, error) {
 	if len(target) == 0 {
-		return "", uc.NewErrInvalidParameter("target", uc.NewErrEmpty(target))
+		return "", luc.NewErrInvalidParameter("target", luc.NewErrEmpty(target))
 	}
 
 	target_len := len(target)
@@ -569,8 +569,8 @@ func levenshtein_distance(target []rune, target_len int, other []rune, other_len
 				insertion := matrix[i][j-1] + 1
 				substitution := matrix[i-1][j-1] + 1
 
-				min_first := uc.Min(deletion, insertion)
-				min_second := uc.Min(min_first, substitution)
+				min_first := luc.Min(deletion, insertion)
+				min_second := luc.Min(min_first, substitution)
 				matrix[i][j] = min_second
 			}
 		}

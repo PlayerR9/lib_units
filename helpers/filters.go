@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 	lus "github.com/PlayerR9/lib_units/slices"
 )
 
@@ -108,7 +108,7 @@ func FilterByNegativeWeight[T Helperer[O], O any](S []T) []T {
 //   - useMax: True if the maximum weight should be used, false otherwise.
 //
 // Returns:
-//   - []*uc.Pair[O, error]: The results with the maximum weight.
+//   - []*luc.Pair[O, error]: The results with the maximum weight.
 //   - bool: True if the slice was filtered, false otherwise.
 //
 // Behaviors:
@@ -153,7 +153,7 @@ func SuccessOrFail[T Helperer[O], O any](batch []T, useMax bool) ([]T, bool) {
 //
 // Behaviors:
 //   - This function returns either the successful results or the original slice.
-func EvaluateSimpleHelpers[T any, O any](batch []T, f uc.EvalOneFunc[T, O]) ([]*SimpleHelper[O], bool) {
+func EvaluateSimpleHelpers[T any, O any](batch []T, f luc.EvalOneFunc[T, O]) ([]*SimpleHelper[O], bool) {
 	if len(batch) == 0 {
 		return nil, true
 	}
@@ -195,7 +195,7 @@ func EvaluateSimpleHelpers[T any, O any](batch []T, f uc.EvalOneFunc[T, O]) ([]*
 //
 // Behaviors:
 //   - This function returns either the successful results or the original slice.
-func EvaluateWeightHelpers[T any, O any](batch []T, f uc.EvalOneFunc[T, O], wf WeightFunc[T], useMax bool) ([]*WeightedHelper[O], bool) {
+func EvaluateWeightHelpers[T any, O any](batch []T, f luc.EvalOneFunc[T, O], wf WeightFunc[T], useMax bool) ([]*WeightedHelper[O], bool) {
 	if len(batch) == 0 {
 		return nil, true
 	}

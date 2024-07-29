@@ -6,7 +6,7 @@
 package helpers
 
 import (
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 )
 
 // Helper is an interface that represents a helper.
@@ -30,7 +30,7 @@ type Helperer[O any] interface {
 // Parameters:
 //   - S: slice of helpers.
 //   - f: the function to execute.
-func DoIfSuccess[T Helperer[O], O any](S []T, f uc.DoFunc[O]) {
+func DoIfSuccess[T Helperer[O], O any](S []T, f luc.DoFunc[O]) {
 	if len(S) == 0 {
 		return
 	}
@@ -48,7 +48,7 @@ func DoIfSuccess[T Helperer[O], O any](S []T, f uc.DoFunc[O]) {
 // Parameters:
 //   - S: slice of helpers.
 //   - f: the function to execute.
-func DoIfFailure[T Helperer[O], O any](S []T, f uc.DualDoFunc[O, error]) {
+func DoIfFailure[T Helperer[O], O any](S []T, f luc.DualDoFunc[O, error]) {
 	if len(S) == 0 {
 		return
 	}

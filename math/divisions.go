@@ -3,7 +3,7 @@ package MathExt
 import (
 	"math/big"
 
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 )
 
 // PrimeFactorization is a function that performs prime factorization on an
@@ -118,16 +118,16 @@ func GreatestCommonDivisor(a, b int) int {
 //     the denominator is less than or equal to 0.
 func BigFloatDivision(numerator, denominator int) (*big.Float, error) {
 	if numerator < 0 {
-		return new(big.Float), uc.NewErrInvalidParameter(
+		return new(big.Float), luc.NewErrInvalidParameter(
 			"numerator",
-			uc.NewErrGTE(0),
+			luc.NewErrGTE(0),
 		)
 	}
 
 	if denominator <= 0 {
-		return new(big.Float), uc.NewErrInvalidParameter(
+		return new(big.Float), luc.NewErrInvalidParameter(
 			"denominator",
-			uc.NewErrGT(0),
+			luc.NewErrGT(0),
 		)
 	}
 

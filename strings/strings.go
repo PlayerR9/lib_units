@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 )
 
 // filter_equals returns the indices of the other in the data.
@@ -95,7 +95,7 @@ func IndicesOf(data []string, sep []string, exclude_sep bool) []int {
 //   - err: Any error that occurred while searching for the tokens.
 //
 // Errors:
-//   - *uc.ErrInvalidParameter: If the closingToken is an empty string.
+//   - *luc.ErrInvalidParameter: If the closingToken is an empty string.
 //   - *ErrTokenNotFound: If the opening or closing token is not found in the
 //     content.
 //   - *ErrNeverOpened: If the closing token is found without any
@@ -112,7 +112,7 @@ func FindContentIndexes(op_token, cl_token string, tokens []string) (result [2]i
 	result[1] = -1
 
 	if cl_token == "" {
-		err = uc.NewErrInvalidParameter("cl_token", uc.NewErrEmpty(cl_token))
+		err = luc.NewErrInvalidParameter("cl_token", luc.NewErrEmpty(cl_token))
 		return
 	}
 

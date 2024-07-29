@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"strings"
 
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 )
 
 // Serieser is an interface for series.
@@ -31,15 +31,15 @@ type Serieser interface {
 //   - error: An error if the calculation fails.
 //
 // Errors:
-//   - *uc.ErrInvalidParameter: If n is less than or equal to 0 or if
+//   - *luc.ErrInvalidParameter: If n is less than or equal to 0 or if
 //     there are not enough values to calculate the average.
 func ApproximateConvergence(values []*big.Float, n int) (*big.Float, error) {
 	if n <= 0 {
-		return nil, uc.NewErrInvalidParameter("n", uc.NewErrGT(0))
+		return nil, luc.NewErrInvalidParameter("n", luc.NewErrGT(0))
 	} else if len(values) < n {
-		return nil, uc.NewErrInvalidParameter(
+		return nil, luc.NewErrInvalidParameter(
 			"n",
-			uc.NewErrOutOfBounds(n, 0, len(values)),
+			luc.NewErrOutOfBounds(n, 0, len(values)),
 		)
 	}
 
@@ -67,13 +67,13 @@ func CalculateConvergence(series Serieser, upperLimit int, delta int) (values []
 	for i := 0; i < upperLimit-delta; i++ {
 		ithTerm, reason := series.Term(i)
 		if reason != nil {
-			err = uc.NewErrAt(i+1, "term", reason)
+			err = luc.NewErrAt(i+1, "term", reason)
 			return
 		}
 
 		ithPlusDeltaTerm, reason := series.Term(i + delta)
 		if reason != nil {
-			err = uc.NewErrAt(i+delta+1, "term", reason)
+			err = luc.NewErrAt(i+delta+1, "term", reason)
 			return
 		}
 

@@ -3,7 +3,7 @@ package Observing
 import (
 	"sync"
 
-	uc "github.com/PlayerR9/MyGoLib/Units/common"
+	luc "github.com/PlayerR9/MyGoLib/Units/common"
 )
 
 // Subject is the subject that observers observe.
@@ -21,7 +21,7 @@ type Subject[T any] struct {
 // Copy implements the Copier interface.
 //
 // However, the obsevers are not copied.
-func (s *Subject[T]) Copy() uc.Copier {
+func (s *Subject[T]) Copy() luc.Copier {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 

@@ -185,3 +185,50 @@ func AssertNil[T any](elem *T, param_name string) {
 
 	panic(strings.Join(values, " "))
 }
+
+// AssertType panics if the element is not of type T.
+//
+// Parameters:
+//   - elem: The element to check.
+//   - allow_nil: If true, the element can be nil.
+//   - var_name: The name of the variable.
+//
+// The panic message is the message "expected <var_name> to be of type <T>, got <elem> instead".
+func AssertType[T any](elem any, allow_nil bool, var_name string) {
+	if elem == nil {
+		if !allow_nil {
+			panic(fmt.Sprintf("expected %q to be of type %T, got nil instead", var_name, *new(T)))
+		}
+
+		return
+	}
+
+	_, ok := elem.(T)
+	if !ok {
+		panic(fmt.Sprintf("expected %q to be of type %T, got %T instead", var_name, *new(T), elem))
+	}
+}
+
+// AssertConv tries to convert the element to type T. If the conversion fails,
+// it panics.
+//
+// Parameters:
+//   - elem: The element to check.
+//   - var_name: The name of the variable.
+//
+// Returns:
+//   - T: The element converted to type T.
+//
+// The panic message is the message "expected <var_name> to be of type <T>, got <elem> instead".
+func AssertConv[T any](elem any, var_name string) T {
+	if elem == nil {
+		panic(fmt.Sprintf("expected %q to be of type %T, got nil instead", var_name, *new(T)))
+	}
+
+	res, ok := elem.(T)
+	if !ok {
+		panic(fmt.Sprintf("expected %q to be of type %T, got %T instead", var_name, *new(T), elem))
+	}
+
+	return res
+}

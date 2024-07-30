@@ -3,7 +3,7 @@ package Observing
 import (
 	"sync"
 
-	luc "github.com/PlayerR9/MyGoLib/Units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 )
 
 // Subject is the subject that observers observe.

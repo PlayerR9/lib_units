@@ -2,7 +2,6 @@ package common
 
 import (
 	"fmt"
-	"strconv"
 )
 
 // Objecter is an interface that defines the behavior of an object that can be
@@ -66,66 +65,5 @@ func EqualOf(a, b any) bool {
 		return ok
 	default:
 		return a == b
-	}
-}
-
-// StringOf converts any type to a string.
-//
-// Parameters:
-//   - elem: The element to convert to a string.
-//
-// Returns:
-//   - string: The string representation of the element.
-//
-// Behaviors:
-//   - String elements are returned as is.
-//   - fmt.Stringer elements have their String method called.
-//   - error elements have their Error method called.
-//   - []byte and []rune elements are converted to strings.
-//   - Other elements are converted to strings using fmt.Sprintf and the %v format.
-func StringOf(elem any) string {
-	if elem == nil {
-		return ""
-	}
-
-	switch elem := elem.(type) {
-	case int:
-		return strconv.FormatInt(int64(elem), 10)
-	case int8:
-		return strconv.FormatInt(int64(elem), 10)
-	case int16:
-		return strconv.FormatInt(int64(elem), 10)
-	case int32:
-		return strconv.FormatInt(int64(elem), 10)
-	case int64:
-		return strconv.FormatInt(elem, 10)
-	case uint:
-		return strconv.FormatUint(uint64(elem), 10)
-	case uint8:
-		return strconv.FormatUint(uint64(elem), 10)
-	case uint16:
-		return strconv.FormatUint(uint64(elem), 10)
-	case uint32:
-		return strconv.FormatUint(uint64(elem), 10)
-	case uint64:
-		return strconv.FormatUint(elem, 10)
-	case float32:
-		return strconv.FormatFloat(float64(elem), 'f', -1, 32)
-	case float64:
-		return strconv.FormatFloat(elem, 'f', -1, 64)
-	case bool:
-		return strconv.FormatBool(elem)
-	case string:
-		return elem
-	case fmt.Stringer:
-		return elem.String()
-	case error:
-		return elem.Error()
-	case []byte:
-		return string(elem)
-	case []rune:
-		return string(elem)
-	default:
-		return fmt.Sprintf("%v", elem)
 	}
 }

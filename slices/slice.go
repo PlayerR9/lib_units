@@ -1,6 +1,8 @@
 package slices
 
 import (
+	"cmp"
+
 	luc "github.com/PlayerR9/lib_units/common"
 	"golang.org/x/exp/slices"
 )
@@ -491,3 +493,25 @@ func Difference[T comparable](S1, S2 []T) []T {
 	return diff
 }
 */
+
+// TryInsert is a helper function that inserts an element into a slice only
+// if the element is not already in the slice.
+//
+// Parameters:
+//   - slc: The slice to insert into.
+//   - e: The element to insert.
+//
+// Returns:
+//   - []T: The slice with the inserted element.
+//
+// This function only works if the slice is sorted.
+func TryInsert[T cmp.Ordered](slc []T, e T) []T {
+	pos, ok := slices.BinarySearch(slc, e)
+	if ok {
+		return slc
+	}
+
+	slc = slices.Insert(slc, pos, e)
+
+	return slc
+}

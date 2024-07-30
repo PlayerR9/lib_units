@@ -3,7 +3,7 @@ package pair
 import (
 	"strings"
 
-	luc "github.com/PlayerR9/lib_units/common"
+	lustr "github.com/PlayerR9/lib_units/strings"
 )
 
 // Pair is a pair of values.
@@ -20,9 +20,9 @@ func (p Pair[A, B]) String() string {
 	var builder strings.Builder
 
 	builder.WriteRune('(')
-	builder.WriteString(luc.StringOf(p.First))
+	builder.WriteString(lustr.GoStringOf(p.First))
 	builder.WriteString(", ")
-	builder.WriteString(luc.StringOf(p.Second))
+	builder.WriteString(lustr.GoStringOf(p.Second))
 	builder.WriteRune(')')
 
 	return builder.String()

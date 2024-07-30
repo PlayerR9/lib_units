@@ -11,7 +11,8 @@ import (
 	"strings"
 	"text/template"
 
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
+	lus "github.com/PlayerR9/lib_units/slices"
 )
 
 // InitLogger initializes the logger with the given prefix.
@@ -51,14 +52,14 @@ func InitLogger(prefix string) *log.Logger {
 func align_generics(fv *StructFieldsVal, tv *TypeListVal, gv *GenericsSignVal) error {
 	if gv == nil {
 		if fv != nil && tv != nil {
-			return uc.NewErrInvalidUsage(
+			return luc.NewErrInvalidUsage(
 				errors.New("not specified the *StructFieldsVal and *TypeListVal but specified the *GenericsSignVal"),
 				"Make sure to call go_generator.SetStructFieldsFlag() and go_generator.SetTypeListFlag() as well",
 			)
 		}
 	} else {
 		if fv == nil && tv == nil {
-			return uc.NewErrInvalidUsage(
+			return luc.NewErrInvalidUsage(
 				errors.New("not specified the *StructFieldsVal and *TypeListVal but specified the *GenericsSignVal"),
 				"Make sure to call go_generator.SetStructFieldsFlag() and go_generator.SetTypeListFlag() as well",
 			)
@@ -68,24 +69,30 @@ func align_generics(fv *StructFieldsVal, tv *TypeListVal, gv *GenericsSignVal) e
 	var all_generics []rune
 
 	if fv != nil {
-		for generic_id := range fv.generics {
-			pos, ok := slices.BinarySearch(all_generics, generic_id)
-			if ok {
-				continue
+		iter := fv.generics.KeyIterator()
+		luc.Assert(iter != nil, "iter must not be nil")
+
+		for {
+			id, err := iter.Consume()
+			if err != nil {
+				break
 			}
 
-			all_generics = slices.Insert(all_generics, pos, generic_id)
+			all_generics = lus.TryInsert(all_generics, id)
 		}
 	}
 
 	if tv != nil {
-		for generic_id := range tv.generics {
-			pos, ok := slices.BinarySearch(all_generics, generic_id)
-			if ok {
-				continue
+		iter := tv.generics.KeyIterator()
+		luc.Assert(iter != nil, "iter must not be nil")
+
+		for {
+			id, err := iter.Consume()
+			if err != nil {
+				break
 			}
 
-			all_generics = slices.Insert(all_generics, pos, generic_id)
+			all_generics = lus.TryInsert(all_generics, id)
 		}
 	}
 
@@ -151,7 +158,7 @@ type Generater interface {
 //   - error: Any other type of error that may have occurred.
 func Generate[T Generater](output_loc string, data T, t *template.Template, doFunc ...func(*T) error) error {
 	if t == nil {
-		return uc.NewErrNilParameter("t")
+		return luc.NewErrNilParameter("t")
 	}
 
 	pkg_name, err := FixImportDir(output_loc)
@@ -161,12 +168,12 @@ func Generate[T Generater](output_loc string, data T, t *template.Template, doFu
 
 	tmp := data.SetPackageName(pkg_name)
 	if tmp == nil {
-		return uc.NewErrNilParameter("data")
+		return luc.NewErrNilParameter("data")
 	}
 
 	data, ok := tmp.(T)
 	if !ok {
-		return uc.NewErrInvalidParameter("data", uc.NewErrUnexpectedType("data", tmp))
+		return luc.NewErrInvalidParameter("data", luc.NewErrUnexpectedType("data", tmp))
 	}
 
 	for _, f := range doFunc {

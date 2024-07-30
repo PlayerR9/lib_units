@@ -1,7 +1,7 @@
 package common
 
 import (
-	"fmt"
+	"cmp"
 	"reflect"
 	"strconv"
 	"strings"
@@ -135,53 +135,15 @@ func GetOrdinalSuffix(number int) string {
 	return builder.String()
 }
 
-// GoStringOf returns a string representation of the element.
-//
-// Parameters:
-//   - elem: The element to get the string representation of.
-//
-// Returns:
-//   - string: The string representation of the element.
-//
-// Behaviors:
-//   - If the element is nil, the function returns "nil".
-//   - If the element implements the fmt.GoStringer interface, the function
-//     returns the result of the GoString method.
-//   - If the element implements the fmt.Stringer interface, the function
-//     returns the result of the String method.
-//   - If the element is a string, the function returns the string enclosed in
-//     double quotes.
-//   - If the element is an error, the function returns the error message
-//     enclosed in double quotes.
-//   - Otherwise, the function returns the result of the %#v format specifier.
-func GoStringOf(elem any) string {
-	if elem == nil {
-		return "nil"
-	}
-
-	switch elem := elem.(type) {
-	case fmt.GoStringer:
-		return elem.GoString()
-	case fmt.Stringer:
-		return strconv.Quote(elem.String())
-	case string:
-		return strconv.Quote(elem)
-	case error:
-		return strconv.Quote(elem.Error())
-	default:
-		return fmt.Sprintf("%#v", elem)
-	}
-}
-
 // Min is a function that takes two parameters, a and b, of any type T
-// according to the uc.CompareOf function and returns the smaller of the two values.
+// according to the cmp.Ordered interface and returns the smaller of the two values.
 //
 // Parameters:
 //   - a, b: The two values to compare.
 //
 // Return:
 //   - T: The smaller of the two values.
-func Min[T Comparable](a, b T) T {
+func Min[T cmp.Ordered](a, b T) T {
 	if a < b {
 		return a
 	} else {
@@ -190,14 +152,14 @@ func Min[T Comparable](a, b T) T {
 }
 
 // Max is a function that takes two parameters, a and b, of any type T
-// according to the uc.CompareOf function and returns the larger of the two values.
+// according to the cmp.Ordered function and returns the larger of the two values.
 //
 // Parameters:
 //   - a, b: The two values to compare.
 //
 // Return:
 //   - T: The larger of the two values.
-func Max[T Comparable](a, b T) T {
+func Max[T cmp.Ordered](a, b T) T {
 	if a > b {
 		return a
 	} else {

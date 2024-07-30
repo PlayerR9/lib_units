@@ -9,7 +9,8 @@ import (
 	"strings"
 	"unicode"
 
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
+	maps "github.com/PlayerR9/lib_units/maps"
 )
 
 var (
@@ -90,7 +91,7 @@ func SetOutputFlag(def_value string, required bool) {
 //     prior to calling this function.
 func GetOutputLoc() (string, error) {
 	if OutputLocFlag == nil {
-		return "", uc.NewErrInvalidUsage(
+		return "", luc.NewErrInvalidUsage(
 			errors.New("output location was not defined"),
 			"Please call the go_generator.SetOutputFlag() function before calling this function.",
 		)
@@ -102,10 +103,10 @@ func GetOutputLoc() (string, error) {
 // StructFieldsVal is a struct that represents the fields value.
 type StructFieldsVal struct {
 	// fields is a map of the fields and their types.
-	fields map[string]string
+	fields *maps.OrderedMap[string, string]
 
 	// generics is a map of the generics and their types.
-	generics map[rune]string
+	generics *maps.OrderedMap[rune, string]
 
 	// is_required is a flag that specifies whether the fields value is required or not.
 	is_required bool
@@ -120,17 +121,25 @@ type StructFieldsVal struct {
 //
 //	"<value1> <type1>, <value2> <type2>, ..."
 func (s *StructFieldsVal) String() string {
-	if len(s.fields) == 0 {
+	if s.fields.Size() == 0 {
 		return ""
 	}
 
 	var values []string
 	var builder strings.Builder
 
-	for name, t := range s.fields {
-		builder.WriteString(name)
+	iter := s.fields.Iterator()
+	luc.Assert(iter != nil, "entry iterator is nil")
+
+	for {
+		entry, err := iter.Consume()
+		if err != nil {
+			break
+		}
+
+		builder.WriteString(entry.Key)
 		builder.WriteRune(' ')
-		builder.WriteString(t)
+		builder.WriteString(entry.Value)
 
 		str := builder.String()
 		values = append(values, str)
@@ -152,7 +161,7 @@ func (s *StructFieldsVal) Set(value string) error {
 
 	fields := strings.Split(value, ",")
 
-	parsed := make(map[string]string)
+	s.fields = maps.NewOrderedMap[string, string]()
 
 	for i, field := range fields {
 		if field == "" {
@@ -163,41 +172,41 @@ func (s *StructFieldsVal) Set(value string) error {
 
 		if len(sub_fields) == 1 {
 			reason := errors.New("missing type")
-			err := uc.NewErrAt(i+1, "field", reason)
+			err := luc.NewErrAt(i+1, "field", reason)
 			return err
 		} else if len(sub_fields) > 2 {
 			reason := errors.New("too many fields")
-			err := uc.NewErrAt(i+1, "field", reason)
+			err := luc.NewErrAt(i+1, "field", reason)
 			return err
 		}
 
-		parsed[sub_fields[0]] = sub_fields[1]
+		ok := s.fields.Add(sub_fields[0], sub_fields[1], false)
+		if !ok {
+			return fmt.Errorf("field %q already exists", sub_fields[0])
+		}
 	}
 
-	if s.count != -1 && len(parsed) != s.count {
-		return fmt.Errorf("wrong number of fields: expected %d, got %d", s.count, len(parsed))
+	size := s.fields.Size()
+
+	if s.count != -1 && size != s.count {
+		return fmt.Errorf("wrong number of fields: expected %d, got %d", s.count, size)
 	}
 
-	s.fields = parsed
+	s.generics = maps.NewOrderedMap[rune, string]()
 
-	// Find generics
-	generics := make(map[rune]string)
-
-	for _, field_type := range s.fields {
+	for _, field_type := range fields {
 		chars, err := ParseGenerics(field_type)
 		ok := IsErrNotGeneric(err)
+
 		if ok {
 			continue
 		} else if err != nil {
-			err := fmt.Errorf("syntax error for type %q: %w", field_type, err)
-			return err
+			return fmt.Errorf("syntax error for type %q: %w", field_type, err)
 		}
 
 		for _, char := range chars {
-			_, ok := generics[char]
-			if !ok {
-				generics[char] = ""
-			}
+			ok := s.generics.Add(char, "", false)
+			luc.AssertOk(ok, "s.generics.Add(%s, %q, false)", strconv.QuoteRune(char), "")
 		}
 	}
 
@@ -254,8 +263,6 @@ func SetStructFieldsFlag(flag_name string, is_required bool, count int, brief st
 	}
 
 	StructFieldsFlag = &StructFieldsVal{
-		fields:      make(map[string]string),
-		generics:    make(map[rune]string),
 		is_required: is_required,
 		count:       count,
 	}
@@ -286,9 +293,9 @@ func SetStructFieldsFlag(flag_name string, is_required bool, count int, brief st
 // GetFields returns the fields of the struct.
 //
 // Returns:
-//   - map[string]string: A map of field names and their types.
+//   - map[string]string: A map of field names and their types. Never returns nil.
 func (s *StructFieldsVal) GetFields() map[string]string {
-	return s.fields
+	return s.fields.GetMap()
 }
 
 // GenericsSignVal is a struct that contains the values of the generics.
@@ -355,12 +362,12 @@ func (s *GenericsSignVal) Set(value string) error {
 
 		letter, g_type, err := parse_generics_value(field)
 		if err != nil {
-			return uc.NewErrAt(i+1, "field", err)
+			return luc.NewErrAt(i+1, "field", err)
 		}
 
 		err = s.add(letter, g_type)
 		if err != nil {
-			return uc.NewErrAt(i+1, "field", err)
+			return luc.NewErrAt(i+1, "field", err)
 		}
 	}
 
@@ -452,7 +459,7 @@ func SetGenericsSignFlag(flag_name string, is_required bool, count int) {
 // Assertions:
 //   - field != ""
 func parse_generics_value(field string) (rune, string, error) {
-	uc.Assert(field != "", "field must not be an empty string")
+	luc.Assert(field != "", "field must not be an empty string")
 
 	sub_fields := strings.Split(field, "/")
 
@@ -487,8 +494,8 @@ func parse_generics_value(field string) (rune, string, error) {
 //   - letter is an upper case letter.
 //   - g_type != ""
 func (gv *GenericsSignVal) add(letter rune, g_type string) error {
-	uc.AssertParam("letter", unicode.IsUpper(letter), errors.New("letter must be an upper case letter"))
-	uc.AssertParam("g_type", g_type != "", errors.New("type must be set"))
+	luc.AssertParam("letter", unicode.IsUpper(letter), errors.New("letter must be an upper case letter"))
+	luc.AssertParam("g_type", g_type != "", errors.New("type must be set"))
 
 	pos, ok := slices.BinarySearch(gv.letters, letter)
 	if !ok {
@@ -545,7 +552,7 @@ type TypeListVal struct {
 	types []string
 
 	// generics is a map of the generics and their types.
-	generics map[rune]string
+	generics *maps.OrderedMap[rune, string]
 
 	// is_required is a flag that specifies whether the fields value is required or not.
 	is_required bool
@@ -600,23 +607,22 @@ func (s *TypeListVal) Set(value string) error {
 	s.types = parsed
 
 	// Find generics
-	generics := make(map[rune]string)
+
+	s.generics = maps.NewOrderedMap[rune, string]()
 
 	for _, field_type := range s.types {
 		chars, err := ParseGenerics(field_type)
 		ok := IsErrNotGeneric(err)
+
 		if ok {
 			continue
 		} else if err != nil {
-			err := fmt.Errorf("syntax error for type %q: %w", field_type, err)
-			return err
+			return fmt.Errorf("syntax error for type %q: %w", field_type, err)
 		}
 
 		for _, char := range chars {
-			_, ok := generics[char]
-			if !ok {
-				generics[char] = ""
-			}
+			ok := s.generics.Add(char, "", true)
+			luc.AssertOk(ok, "s.generics.Add(%s, %q, true)", strconv.QuoteRune(char), "")
 		}
 	}
 
@@ -670,7 +676,6 @@ func SetTypeListFlag(flag_name string, is_required bool, count int, brief string
 
 	TypeListFlag = &TypeListVal{
 		types:       make([]string, 0),
-		generics:    make(map[rune]string),
 		is_required: is_required,
 		count:       count,
 	}
@@ -705,10 +710,10 @@ func SetTypeListFlag(flag_name string, is_required bool, count int, brief string
 //
 // Return:
 //   - string: The type at the given index.
-//   - error: An error of type *uc.ErrInvalidParameter if the index is out of bounds.
+//   - error: An error of type *luc.ErrInvalidParameter if the index is out of bounds.
 func (s *TypeListVal) GetType(idx int) (string, error) {
 	if idx < 0 || idx >= len(s.types) {
-		return "", uc.NewErrInvalidParameter("idx", uc.NewErrOutOfBounds(idx, 0, len(s.types)))
+		return "", luc.NewErrInvalidParameter("idx", luc.NewErrOutOfBounds(idx, 0, len(s.types)))
 	}
 
 	return s.types[idx], nil

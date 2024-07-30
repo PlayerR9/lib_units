@@ -10,7 +10,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	uc "github.com/PlayerR9/lib_units/common"
+	luc "github.com/PlayerR9/lib_units/common"
 )
 
 const (
@@ -24,11 +24,18 @@ var (
 )
 
 func init() {
-	GoReservedKeywords = []string{
+	keys := []string{
 		"break", "case", "chan", "const", "continue", "default", "defer", "else",
 		"fallthrough", "for", "func", "go", "goto", "if", "import", "interface",
 		"map", "package", "range", "return", "select", "struct", "switch", "type",
 		"var",
+	}
+
+	for _, key := range keys {
+		pos, ok := slices.BinarySearch(GoReservedKeywords, key)
+		luc.AssertOk(ok, "slices.BinarySearch(GoReservedKeywords, %q)", key)
+
+		GoReservedKeywords = slices.Insert(GoReservedKeywords, pos, key)
 	}
 }
 
@@ -42,7 +49,7 @@ func init() {
 //   - error: An error of type *ErrInvalidID if the input string is not a valid identifier.
 func IsGenericsID(id string) (rune, error) {
 	if id == "" {
-		return '\000', NewErrInvalidID(id, uc.NewErrEmpty(id))
+		return '\000', NewErrInvalidID(id, luc.NewErrEmpty(id))
 	}
 
 	size := utf8.RuneCountInString(id)
@@ -50,7 +57,10 @@ func IsGenericsID(id string) (rune, error) {
 		return '\000', NewErrInvalidID(id, errors.New("value must be a single character"))
 	}
 
-	letter := rune(id[0])
+	letter, _ := utf8.DecodeRuneInString(id)
+	if letter == utf8.RuneError {
+		return '\000', NewErrInvalidID(id, errors.New("value is not a valid unicode character"))
+	}
 
 	ok := unicode.IsUpper(letter)
 	if !ok {
@@ -74,7 +84,7 @@ func IsGenericsID(id string) (rune, error) {
 //   - error: An error if the string is a possibly valid list of generic types but fails to parse.
 func ParseGenerics(str string) ([]rune, error) {
 	if str == "" {
-		return nil, NewErrNotGeneric(uc.NewErrEmpty(str))
+		return nil, NewErrNotGeneric(luc.NewErrEmpty(str))
 	}
 
 	var letters []rune
@@ -98,7 +108,7 @@ func ParseGenerics(str string) ([]rune, error) {
 		for i, field := range fields {
 			letter, err := IsGenericsID(field)
 			if err != nil {
-				err := uc.NewErrAt(i+1, "field", err)
+				err := luc.NewErrAt(i+1, "field", err)
 				return nil, err
 			}
 
@@ -132,12 +142,12 @@ func FixImportDir(dest string) (string, error) {
 
 	dir := filepath.Dir(dest)
 	if dir == "." {
-		uc, err := build.ImportDir(".", 0)
+		pkg, err := build.ImportDir(".", 0)
 		if err != nil {
 			return "", err
 		}
 
-		return uc.Name, nil
+		return pkg.Name, nil
 	}
 
 	_, right := filepath.Split(dir)
@@ -157,7 +167,7 @@ func FixImportDir(dest string) (string, error) {
 //   - error: An error if the type signature cannot be created. (i.e., the type name is empty)
 func MakeTypeSig(type_name string, suffix string) (string, error) {
 	if type_name == "" {
-		return "", uc.NewErrInvalidParameter("type_name", uc.NewErrEmpty(type_name))
+		return "", luc.NewErrInvalidParameter("type_name", luc.NewErrEmpty(type_name))
 	}
 
 	var builder strings.Builder
@@ -198,7 +208,7 @@ func FixOutputLoc(type_name, suffix string) (string, error) {
 	}
 
 	if type_name == "" {
-		return "", uc.NewErrInvalidParameter("type_name", uc.NewErrEmpty(type_name))
+		return "", luc.NewErrInvalidParameter("type_name", luc.NewErrEmpty(type_name))
 	}
 
 	var filename string
@@ -267,7 +277,7 @@ const (
 // function does not perform any checks.
 func IsValidName(variable_name string, keywords []string, exported GoExport) error {
 	if variable_name == "" {
-		err := uc.NewErrEmpty(variable_name)
+		err := luc.NewErrEmpty(variable_name)
 		return err
 	}
 
@@ -283,10 +293,9 @@ func IsValidName(variable_name string, keywords []string, exported GoExport) err
 			return errors.New("identifier must start with a lowercase letter")
 		}
 
-		ok = slices.Contains(GoReservedKeywords, variable_name)
+		_, ok = slices.BinarySearch(GoReservedKeywords, variable_name)
 		if ok {
-			err := errors.New("name is a reserved keyword")
-			return err
+			return fmt.Errorf("identifier (%q) is a Go reserved keyword", variable_name)
 		}
 	case Exported:
 		r, _ := utf8.DecodeRuneInString(variable_name)
@@ -321,7 +330,7 @@ func IsValidName(variable_name string, keywords []string, exported GoExport) err
 //   - error: An error if the variable name is invalid.
 func FixVariableName(variable_name string, keywords []string, exported GoExport) (string, error) {
 	if variable_name == "" {
-		err := uc.NewErrEmpty(variable_name)
+		err := luc.NewErrEmpty(variable_name)
 		return "", err
 	}
 
@@ -349,7 +358,7 @@ func FixVariableName(variable_name string, keywords []string, exported GoExport)
 			variable_name = builder.String()
 		}
 
-		ok = slices.Contains(GoReservedKeywords, variable_name)
+		_, ok = slices.BinarySearch(GoReservedKeywords, variable_name)
 		if ok {
 			return "", fmt.Errorf("variable (%q) is a reserved keyword", variable_name)
 		}
@@ -401,7 +410,7 @@ func FixVariableName(variable_name string, keywords []string, exported GoExport)
 //   - error: An error if any.
 func MakeParameterList() (string, error) {
 	if StructFieldsFlag == nil {
-		return "", uc.NewErrInvalidUsage(
+		return "", luc.NewErrInvalidUsage(
 			errors.New("cannot make parameter list without StructFieldsFlag"),
 			"Make sure to set StructFieldsFlag before calling this function",
 		)
@@ -410,18 +419,27 @@ func MakeParameterList() (string, error) {
 	var field_list []string
 	var type_list []string
 
-	for k, v := range StructFieldsFlag.fields {
-		if k == "" {
-			err := errors.New("found type name with empty name")
-			return "", err
+	iter := StructFieldsFlag.fields.Iterator()
+	luc.Assert(iter != nil, "iterator must not be nil")
+
+	for {
+		entry, err := iter.Consume()
+		if err != nil {
+			break
 		}
 
-		first_letter := rune(k[0])
+		if entry.Key == "" {
+			return "", errors.New("found type name with empty name")
+		}
+
+		first_letter, _ := utf8.DecodeRuneInString(entry.Key)
+		if first_letter == utf8.RuneError {
+			return "", errors.New("invalid UTF-8 encoding")
+		}
 
 		ok := unicode.IsLetter(first_letter)
 		if !ok {
-			err := fmt.Errorf("type name %q must start with a letter", k)
-			return "", err
+			return "", fmt.Errorf("type name %q must start with a letter", entry.Key)
 		}
 
 		ok = unicode.IsUpper(first_letter)
@@ -429,11 +447,11 @@ func MakeParameterList() (string, error) {
 			continue
 		}
 
-		pos, ok := slices.BinarySearch(field_list, k)
-		uc.AssertF(!ok, "%q must be unique", k)
+		pos, ok := slices.BinarySearch(field_list, entry.Key)
+		luc.AssertF(!ok, "%q must be unique", entry.Key)
 
-		field_list = slices.Insert(field_list, pos, k)
-		type_list = slices.Insert(type_list, pos, v)
+		field_list = slices.Insert(field_list, pos, entry.Key)
+		type_list = slices.Insert(type_list, pos, entry.Value)
 	}
 
 	var values []string
@@ -469,7 +487,7 @@ func MakeParameterList() (string, error) {
 //   - error: An error if any.
 func MakeAssignmentList() (map[string]string, error) {
 	if StructFieldsFlag == nil {
-		return nil, uc.NewErrInvalidUsage(
+		return nil, luc.NewErrInvalidUsage(
 			errors.New("cannot make assignment list without StructFieldsFlag"),
 			"Make sure to set the StructFieldsFlag before calling this function",
 		)
@@ -478,18 +496,27 @@ func MakeAssignmentList() (map[string]string, error) {
 	var field_list []string
 	var type_list []string
 
-	for k, v := range StructFieldsFlag.fields {
-		if k == "" {
-			err := errors.New("found type name with empty name")
-			return nil, err
+	iter := StructFieldsFlag.fields.Iterator()
+	luc.Assert(iter != nil, "iterator must not be nil")
+
+	for {
+		entry, err := iter.Consume()
+		if err != nil {
+			break
 		}
 
-		first_letter := rune(k[0])
+		if entry.Key == "" {
+			return nil, errors.New("found type name with empty name")
+		}
+
+		first_letter, _ := utf8.DecodeRuneInString(entry.Key)
+		if first_letter == utf8.RuneError {
+			return nil, errors.New("invalid UTF-8 encoding")
+		}
 
 		ok := unicode.IsLetter(first_letter)
 		if !ok {
-			err := fmt.Errorf("type name %q must start with a letter", k)
-			return nil, err
+			return nil, fmt.Errorf("type name %q must start with a letter", entry.Key)
 		}
 
 		ok = unicode.IsUpper(first_letter)
@@ -497,17 +524,22 @@ func MakeAssignmentList() (map[string]string, error) {
 			continue
 		}
 
-		pos, ok := slices.BinarySearch(field_list, k)
-		uc.AssertF(!ok, "%q must be unique", k)
+		pos, ok := slices.BinarySearch(field_list, entry.Key)
+		luc.AssertF(!ok, "%q must be unique", entry.Key)
 
-		field_list = slices.Insert(field_list, pos, k)
-		type_list = slices.Insert(type_list, pos, v)
+		field_list = slices.Insert(field_list, pos, entry.Key)
+		type_list = slices.Insert(type_list, pos, entry.Value)
 	}
 
 	assignment_map := make(map[string]string)
 
 	for i := 0; i < len(field_list); i++ {
 		param := strings.ToLower(field_list[i])
+
+		_, ok := slices.BinarySearch(GoReservedKeywords, param)
+		if ok {
+			param = "elem_" + param
+		}
 
 		assignment_map[field_list[i]] = param
 	}

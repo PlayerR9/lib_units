@@ -11,7 +11,6 @@ import (
 	"unicode/utf8"
 
 	luc "github.com/PlayerR9/lib_units/common"
-	luref "github.com/PlayerR9/lib_units/reflect"
 	lus "github.com/PlayerR9/lib_units/slices"
 )
 
@@ -658,17 +657,104 @@ func ZeroValueOf(type_name string, custom map[string]string) string {
 // just a wrapper around the reflect.GetStringOf function.
 //
 // Parameters:
+//   - var_name: The name of the variable.
 //   - type_name: The name of the type.
-//   - elem: The element to get the string of.
 //   - custom: The custom strings to use. Empty values are ignored.
 //
 // Returns:
 //   - string: The string function call.
 //   - []string: The dependencies of the string function call.
-func GetStringFunctionCall(type_name string, elem any, custom map[string][]string) (string, []string) {
-	f_call := luref.GetStringOf(type_name, elem, custom)
+func GetStringFunctionCall(var_name string, type_name string, custom map[string][]string) (string, []string) {
+	if type_name == "" {
+		return "\"nil\"", nil
+	}
 
-	return f_call.Call, f_call.Dependencies
+	if custom != nil {
+		values, ok := custom[type_name]
+		if ok && len(values) > 0 {
+			return values[0], values[1:]
+		}
+	}
+
+	var builder strings.Builder
+	var dependencies []string
+
+	switch type_name {
+	case "bool":
+		builder.WriteString("strconv.FormatBool(")
+		builder.WriteString(var_name)
+		builder.WriteString(")")
+
+		dependencies = append(dependencies, "strconv")
+	case "byte":
+		builder.WriteString("string(")
+		builder.WriteString(var_name)
+		builder.WriteString(")")
+	case "complex64":
+		builder.WriteString("strconv.FormatComplex(")
+		builder.WriteString(var_name)
+		builder.WriteString(", 'f', -1, 64)")
+
+		dependencies = append(dependencies, "strconv")
+	case "complex128":
+		builder.WriteString("strconv.FormatComplex(")
+		builder.WriteString(var_name)
+		builder.WriteString(", 'f', -1, 128)")
+
+		dependencies = append(dependencies, "strconv")
+	case "float32":
+		builder.WriteString("strconv.FormatFloat(")
+		builder.WriteString(var_name)
+		builder.WriteString(", 'f', -1, 32)")
+
+		dependencies = append(dependencies, "strconv")
+	case "float64":
+		builder.WriteString("strconv.FormatFloat(")
+		builder.WriteString(var_name)
+		builder.WriteString(", 'f', -1, 64)")
+
+		dependencies = append(dependencies, "strconv")
+	case "int", "int8", "int16", "int32":
+		builder.WriteString("strconv.FormatInt(int64(")
+		builder.WriteString(var_name)
+		builder.WriteString("), 10)")
+
+		dependencies = append(dependencies, "strconv")
+	case "int64":
+		builder.WriteString("strconv.FormatInt(")
+		builder.WriteString(var_name)
+		builder.WriteString(", 10)")
+
+		dependencies = append(dependencies, "strconv")
+	case "rune":
+		builder.WriteString("string(")
+		builder.WriteString(var_name)
+		builder.WriteString(")")
+	case "string":
+		builder.WriteString(var_name)
+	case "uint", "uint8", "uint16", "uint32", "uintptr":
+		builder.WriteString("strconv.FormatUint(uint64(")
+		builder.WriteString(var_name)
+		builder.WriteString("), 10)")
+
+		dependencies = append(dependencies, "strconv")
+	case "uint64":
+		builder.WriteString("strconv.FormatUint(")
+		builder.WriteString(var_name)
+		builder.WriteString(", 10)")
+
+		dependencies = append(dependencies, "strconv")
+	case "error":
+		builder.WriteString(var_name)
+		builder.WriteString(".Error()")
+	default:
+		builder.WriteString("fmt.Sprintf(\"%v\", ")
+		builder.WriteString(var_name)
+
+		dependencies = append(dependencies, "fmt")
+	}
+
+	return builder.String(), dependencies
 }
 
 // GetPackages returns a list of packages from a list of strings.

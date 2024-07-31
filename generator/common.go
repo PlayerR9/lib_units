@@ -691,9 +691,9 @@ func GetStringFunctionCall(var_name string, type_name string, custom map[string]
 		builder.WriteString(var_name)
 		builder.WriteString(")")
 	case "complex64":
-		builder.WriteString("strconv.FormatComplex(")
+		builder.WriteString("strconv.FormatComplex(complex128(")
 		builder.WriteString(var_name)
-		builder.WriteString(", 'f', -1, 64)")
+		builder.WriteString("), 'f', -1, 64)")
 
 		dependencies = append(dependencies, "strconv")
 	case "complex128":
@@ -703,9 +703,9 @@ func GetStringFunctionCall(var_name string, type_name string, custom map[string]
 
 		dependencies = append(dependencies, "strconv")
 	case "float32":
-		builder.WriteString("strconv.FormatFloat(")
+		builder.WriteString("strconv.FormatFloat(float64(")
 		builder.WriteString(var_name)
-		builder.WriteString(", 'f', -1, 32)")
+		builder.WriteString("), 'f', -1, 32)")
 
 		dependencies = append(dependencies, "strconv")
 	case "float64":
@@ -750,6 +750,7 @@ func GetStringFunctionCall(var_name string, type_name string, custom map[string]
 	default:
 		builder.WriteString("fmt.Sprintf(\"%v\", ")
 		builder.WriteString(var_name)
+		builder.WriteString(")")
 
 		dependencies = append(dependencies, "fmt")
 	}

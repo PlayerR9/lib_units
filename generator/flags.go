@@ -42,6 +42,11 @@ var (
 //	SetOutputFlag("path/to/file.go", false)
 //	SetOutputFlag("", true) <-> SetOutputFlag("path/to/file.go", true)
 //
+// However, the def_value parameter does not specify the actual default location of the output file.
+// Instead, it is merely used in the "usage" portion of the flag specification in order to give the user
+// more information about the location of the output file. Thus, if no output flag is set, the actual
+// default location of the flag is an empty string.
+//
 // Documentation:
 //
 // **Flag: Output File**
@@ -383,6 +388,7 @@ func (s *GenericsSignVal) Set(value string) error {
 // Parameters:
 //   - flag_name: The name of the flag.
 //   - is_required: Whether the flag is required or not.
+//   - count: The number of generics. If -1, no upper bound is set, 0 means no generics.
 //
 // Documentation:
 //
@@ -717,4 +723,11 @@ func (s *TypeListVal) GetType(idx int) (string, error) {
 	}
 
 	return s.types[idx], nil
+}
+
+// PrintFlags prints the default values of the flags.
+//
+// It is useful for debugging and for error messages.
+func PrintFlags() {
+	flag.PrintDefaults()
 }

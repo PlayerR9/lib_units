@@ -287,7 +287,7 @@ func MultiMatcher(chars []rune, stream CharStream) (string, error) {
 	if stream == nil {
 		return "", luc.NewErrNilParameter("stream")
 	} else if len(chars) == 0 {
-		return "", luc.NewErrInvalidParameter("chars", luc.NewErrEmpty(chars))
+		return "", luc.NewErrInvalidParameter("chars", luc.NewErrEmpty("slice of runes"))
 	}
 
 	var builder strings.Builder

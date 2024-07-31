@@ -2,7 +2,6 @@ package common
 
 import (
 	"cmp"
-	"reflect"
 	"strconv"
 	"strings"
 )
@@ -61,37 +60,6 @@ type RoutineFunc func()
 // Returns:
 //   - error: An error if the element is invalid.
 type ErrorIfFunc[T any] func(elem T) error
-
-// TypeOf returns the type of the value as a string.
-//
-// Parameters:
-//   - value: The value to get the type of.
-//
-// Returns:
-//   - string: The type of the value.
-func TypeOf(value any) string {
-	if value == nil {
-		return "nil"
-	}
-
-	return reflect.TypeOf(value).String()
-}
-
-// IsEmpty returns true if the element is empty.
-//
-// Parameters:
-//   - elem: The element to check.
-//
-// Returns:
-//   - bool: True if the element is empty, false otherwise.
-func IsEmpty(elem any) bool {
-	if elem == nil {
-		return true
-	}
-
-	value := reflect.ValueOf(elem)
-	return value.IsZero()
-}
 
 // GetOrdinalSuffix returns the ordinal suffix for a given integer.
 //

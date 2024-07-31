@@ -2,7 +2,7 @@ package common
 
 import (
 	"fmt"
-	"reflect"
+
 	"strconv"
 	"strings"
 )
@@ -35,21 +35,6 @@ func AssertParam(param string, cond bool, reason error) {
 
 	err := NewErrInvalidParameter(param, reason)
 	panic(err.Error())
-}
-
-// AssertIfZero panics if the element is zero.
-//
-// Parameters:
-//   - elem: The element to check.
-//   - msg: The message to show if the element is zero.
-//
-// The panic message is the string msg.
-func AssertIfZero(elem any, msg string) {
-	value := reflect.ValueOf(elem)
-	ok := value.IsZero()
-	if ok {
-		panic(msg)
-	}
 }
 
 // AssertF panics if the condition is false.
@@ -153,7 +138,7 @@ func AssertDerefNil[T any](elem *T, param_name string) T {
 		"(",
 		strconv.Quote(param_name),
 		")",
-		"must not be nil",
+		NewErrNilValue().Error(),
 	}
 
 	panic(strings.Join(values, " "))
@@ -180,7 +165,7 @@ func AssertNil[T any](elem *T, param_name string) {
 		"(",
 		strconv.Quote(param_name),
 		")",
-		"must not be nil",
+		NewErrNilValue().Error(),
 	}
 
 	panic(strings.Join(values, " "))

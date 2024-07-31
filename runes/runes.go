@@ -469,7 +469,7 @@ func (lt *LavenshteinTable) AddWord(word string) error {
 //   - *ErrNoClosestWordFound: If no closest word is found.
 func (lt *LavenshteinTable) GetClosest(target []rune) (string, error) {
 	if len(target) == 0 {
-		return "", luc.NewErrInvalidParameter("target", luc.NewErrEmpty(target))
+		return "", luc.NewErrInvalidParameter("target", luc.NewErrEmpty("slice of runes"))
 	}
 
 	target_len := len(target)

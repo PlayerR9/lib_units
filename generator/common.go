@@ -11,6 +11,8 @@ import (
 	"unicode/utf8"
 
 	luc "github.com/PlayerR9/lib_units/common"
+	luref "github.com/PlayerR9/lib_units/reflect"
+	lus "github.com/PlayerR9/lib_units/slices"
 )
 
 const (
@@ -190,25 +192,45 @@ func MakeTypeSig(type_name string, suffix string) (string, error) {
 // FixOutputLoc fixes the output location.
 //
 // Parameters:
-//   - type_name: The name of the type.
-//   - suffix: The suffix of the type.
+//   - file_name: The name of the file.
+//   - suffix: The suffix of the file.
 //
 // Returns:
 //   - string: The output location.
 //   - error: An error if any.
 //
 // Errors:
-//   - *common.ErrInvalidParameter: If the type name is empty.
+//   - *common.ErrInvalidParameter: If the file name is empty.
 //   - *common.ErrInvalidUsage: If the OutputLoc flag was not set.
 //   - error: Any other error that may have occurred.
-func FixOutputLoc(type_name, suffix string) (string, error) {
-	output_loc, err := GetOutputLoc()
-	if err != nil {
-		return "", err
+//
+// The suffix parameter must end with the ".go" extension. Plus, the output
+// location is always lowercased.
+//
+// NOTES: This function only sets the output location if the user did not set
+// the output flag. If they did, this function won't do anything but the necessary
+// checks and validations.
+//
+// Example:
+//
+//	loc, err := FixOutputLoc("test", ".go")
+//	if err != nil {
+//	  panic(err)
+//	}
+//
+//	fmt.Println(loc) // test.go
+func FixOutputLoc(file_name, suffix string) (string, error) {
+	if OutputLocFlag == nil {
+		return "", luc.NewErrInvalidUsage(
+			errors.New("output location was not defined"),
+			"Please call the go_generator.SetOutputFlag() function before calling this function.",
+		)
 	}
 
-	if type_name == "" {
-		return "", luc.NewErrInvalidParameter("type_name", luc.NewErrEmpty(type_name))
+	output_loc := *OutputLocFlag
+
+	if file_name == "" {
+		return "", luc.NewErrInvalidParameter("type_name", luc.NewErrEmpty(file_name))
 	}
 
 	var filename string
@@ -216,8 +238,7 @@ func FixOutputLoc(type_name, suffix string) (string, error) {
 	if output_loc == "" {
 		var builder strings.Builder
 
-		str := strings.ToLower(type_name)
-		builder.WriteString(str)
+		builder.WriteString(file_name)
 		builder.WriteString(suffix)
 
 		filename = builder.String()
@@ -232,6 +253,8 @@ func FixOutputLoc(type_name, suffix string) (string, error) {
 
 		output_loc = filename
 	}
+
+	output_loc = strings.ToLower(output_loc)
 
 	ext := filepath.Ext(output_loc)
 	if ext == "" {
@@ -588,12 +611,20 @@ func init() {
 //
 // Parameters:
 //   - type_name: The name of the type.
+//   - custom: A map of custom types and their zero values.
 //
 // Returns:
 //   - string: The zero value of the type.
-func ZeroValueOf(type_name string) string {
+func ZeroValueOf(type_name string, custom map[string]string) string {
 	if type_name == "" {
 		return ""
+	}
+
+	if custom != nil {
+		zero, ok := custom[type_name]
+		if ok {
+			return zero
+		}
 	}
 
 	for _, prefix := range NillablePrefix {
@@ -621,4 +652,36 @@ func ZeroValueOf(type_name string) string {
 	}
 
 	return "*new(" + type_name + ")"
+}
+
+// GetStringFunctionCall returns the string function call for the given element. It is
+// just a wrapper around the reflect.GetStringOf function.
+//
+// Parameters:
+//   - type_name: The name of the type.
+//   - elem: The element to get the string of.
+//   - custom: The custom strings to use. Empty values are ignored.
+//
+// Returns:
+//   - string: The string function call.
+//   - []string: The dependencies of the string function call.
+func GetStringFunctionCall(type_name string, elem any, custom map[string][]string) (string, []string) {
+	f_call := luref.GetStringOf(type_name, elem, custom)
+
+	return f_call.Call, f_call.Dependencies
+}
+
+// GetPackages returns a list of packages from a list of strings.
+//
+// Parameters:
+//   - packages: The list of strings to get the packages from.
+//
+// Returns:
+//   - []string: The list of packages. Never returns nil.
+func GetPackages(packages []string) []string {
+	if len(packages) == 0 {
+		return make([]string, 0)
+	}
+
+	return lus.OrderedUniquefy(packages)
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"text/template"
@@ -130,10 +131,82 @@ type Generater interface {
 	//
 	// Parameters:
 	//   - pkg_name: The package name to use for the generated code.
-	//
-	// Returns:
-	//   - Generater: The same instance of the Generater. Never nil and of the same type as the caller.
-	SetPackageName(pkg_name string) Generater
+	SetPackageName(pkg_name string)
+}
+
+// DoFunc is the type of the function to perform on the data before generating the code.
+//
+// Parameters:
+//   - T: The data to perform the function on.
+//
+// Returns:
+//   - error: An error if occurred.
+type DoFunc[T Generater] func(T) error
+
+// CodeGenerator is the code generator.
+type CodeGenerator[T Generater] struct {
+	// t is the template to use for the generated code.
+	templ *template.Template
+
+	// do_funcs is the list of functions to perform on the data before generating the code.
+	do_funcs []DoFunc[T]
+}
+
+// NewCodeGenerator creates a new code generator.
+//
+// Parameters:
+//   - templ: The template to use for the generated code.
+//
+// Returns:
+//   - *CodeGenerator: The code generator.
+//   - error: An error of type *common.ErrInvalidParameter if the templ is nil.
+func NewCodeGenerator[T Generater](templ *template.Template) (*CodeGenerator[T], error) {
+	if templ == nil {
+		return nil, luc.NewErrNilParameter("templ")
+	}
+
+	return &CodeGenerator[T]{
+		templ:    templ,
+		do_funcs: make([]DoFunc[T], 0),
+	}, nil
+}
+
+// NewCodeGeneratorFromTemplate creates a new code generator from a template. Panics
+// if the template is not valid.
+//
+// Parameters:
+//   - name: The name of the template.
+//   - templ: The template to use for the generated code.
+//
+// Returns:
+//   - *CodeGenerator: The code generator.
+//   - error: An error of type *common.ErrInvalidParameter if the templ is invalid.
+func NewCodeGeneratorFromTemplate[T Generater](name, templ string) (*CodeGenerator[T], error) {
+	t, err := template.New(name).Parse(templ)
+	if err != nil {
+		return nil, luc.NewErrInvalidParameter("templ", err)
+	}
+
+	luc.AssertNil(t, "t")
+
+	return &CodeGenerator[T]{
+		templ:    t,
+		do_funcs: make([]DoFunc[T], 0),
+	}, nil
+}
+
+// AddDoFunc adds a function to perform on the data before generating the code.
+//
+// Parameters:
+//   - do_func: The function to perform on the data before generating the code.
+//
+// Does nothing if the do_func is nil.
+func (cg *CodeGenerator[T]) AddDoFunc(do_func DoFunc[T]) {
+	if do_func == nil {
+		return
+	}
+
+	cg.do_funcs = append(cg.do_funcs, do_func)
 }
 
 // Generate generates code using the given generator and writes it to the given destination file.
@@ -141,24 +214,24 @@ type Generater interface {
 // WARNING:
 //   - Remember to call this function iff the function go_generator.SetOutputFlag() was called
 //     and only after the function flag.Parse() was called.
-//   - output_loc is the result of the FixOutputLoc() function.
 //
 // Parameters:
-//   - output_loc: The location of the output file.
+//   - file_name: The file name to use for the generated code.
+//   - suffix: The suffix to use for the generated code. This should end with the ".go" extension.
 //   - data: The data to use for the generated code.
-//   - t: The template to use for the generated code.
-//   - doFunc: Functions to perform on the data before generating the code.
 //
 // Returns:
 //   - error: An error if occurred.
 //
 // Errors:
-//   - *common.ErrInvalidParameter: If any of the parameters is nil or if the actual_loc is an empty string when the
-//     IsOutputLocRequired flag was set and the output location was not defined.
+//   - *common.ErrInvalidParameter: If the file_name or suffix is an empty string.
 //   - error: Any other type of error that may have occurred.
-func Generate[T Generater](output_loc string, data T, t *template.Template, doFunc ...func(*T) error) error {
-	if t == nil {
-		return luc.NewErrNilParameter("t")
+func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) error {
+	luc.AssertNil(cg.templ, "cg.templ")
+
+	output_loc, err := FixOutputLoc(file_name, suffix)
+	if err != nil {
+		return fmt.Errorf("failed to fix output location: %w", err)
 	}
 
 	pkg_name, err := FixImportDir(output_loc)
@@ -166,22 +239,14 @@ func Generate[T Generater](output_loc string, data T, t *template.Template, doFu
 		return fmt.Errorf("failed to fix import path: %w", err)
 	}
 
-	tmp := data.SetPackageName(pkg_name)
-	if tmp == nil {
-		return luc.NewErrNilParameter("data")
-	}
+	data.SetPackageName(pkg_name)
 
-	data, ok := tmp.(T)
-	if !ok {
-		return luc.NewErrInvalidParameter("data", luc.NewErrUnexpectedType("data", tmp))
-	}
-
-	for _, f := range doFunc {
+	for _, f := range cg.do_funcs {
 		if f == nil {
 			continue
 		}
 
-		err := f(&data)
+		err := f(data)
 		if err != nil {
 			return err
 		}
@@ -189,12 +254,19 @@ func Generate[T Generater](output_loc string, data T, t *template.Template, doFu
 
 	var buff bytes.Buffer
 
-	err = t.Execute(&buff, data)
+	err = cg.templ.Execute(&buff, data)
 	if err != nil {
 		return err
 	}
 
 	res := buff.Bytes()
+
+	dir := filepath.Dir(output_loc)
+
+	err = os.MkdirAll(dir, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", dir, err)
+	}
 
 	err = os.WriteFile(output_loc, res, 0644)
 	if err != nil {

@@ -148,20 +148,18 @@ func NewErrOutOfBounds(value int, lowerBound, upperBound int) *ErrOutOfBounds {
 }
 
 // ErrEmpty represents an error when a value is empty.
-type ErrEmpty[T any] struct {
-	// Value is the value that caused the error.
-	Value T
+type ErrEmpty struct {
+	// Type is the type of the empty value.
+	Type string
 }
 
 // Error implements the error interface.
 //
-// Message: "<type> must not be empty"
-func (e *ErrEmpty[T]) Error() string {
-	type_str := TypeOf(e.Value)
-
+// Message: "{{ .Type }} must not be empty"
+func (e *ErrEmpty) Error() string {
 	var builder strings.Builder
 
-	builder.WriteString(type_str)
+	builder.WriteString(e.Type)
 	builder.WriteString(" must not be empty")
 
 	return builder.String()
@@ -170,15 +168,14 @@ func (e *ErrEmpty[T]) Error() string {
 // NewErrEmpty creates a new ErrEmpty error.
 //
 // Parameters:
-//   - value: The value that caused the error.
+//   - var_type: The type of the empty value.
 //
 // Returns:
-//   - *ErrEmpty: A pointer to the newly created ErrEmpty.
-func NewErrEmpty[T any](value T) *ErrEmpty[T] {
-	e := &ErrEmpty[T]{
-		Value: value,
+//   - *ErrEmpty: A pointer to the newly created ErrEmpty. Never returns nil.
+func NewErrEmpty(var_type string) *ErrEmpty {
+	return &ErrEmpty{
+		Type: var_type,
 	}
-	return e
 }
 
 // ErrGT represents an error when a value is less than or equal to a specified value.

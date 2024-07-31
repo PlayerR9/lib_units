@@ -221,22 +221,23 @@ func (cg *CodeGenerator[T]) AddDoFunc(do_func DoFunc[T]) {
 //   - data: The data to use for the generated code.
 //
 // Returns:
+//   - string: The output location of the generated code.
 //   - error: An error if occurred.
 //
 // Errors:
 //   - *common.ErrInvalidParameter: If the file_name or suffix is an empty string.
 //   - error: Any other type of error that may have occurred.
-func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) error {
+func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) (string, error) {
 	luc.AssertNil(cg.templ, "cg.templ")
 
 	output_loc, err := FixOutputLoc(file_name, suffix)
 	if err != nil {
-		return fmt.Errorf("failed to fix output location: %w", err)
+		return output_loc, fmt.Errorf("failed to fix output location: %w", err)
 	}
 
 	pkg_name, err := FixImportDir(output_loc)
 	if err != nil {
-		return fmt.Errorf("failed to fix import path: %w", err)
+		return output_loc, fmt.Errorf("failed to fix import path: %w", err)
 	}
 
 	data.SetPackageName(pkg_name)
@@ -248,7 +249,7 @@ func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) error {
 
 		err := f(data)
 		if err != nil {
-			return err
+			return output_loc, err
 		}
 	}
 
@@ -256,7 +257,7 @@ func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) error {
 
 	err = cg.templ.Execute(&buff, data)
 	if err != nil {
-		return err
+		return output_loc, err
 	}
 
 	res := buff.Bytes()
@@ -265,13 +266,13 @@ func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) error {
 
 	err = os.MkdirAll(dir, 0755)
 	if err != nil {
-		return fmt.Errorf("failed to create directory %s: %w", dir, err)
+		return output_loc, fmt.Errorf("failed to create directory %s: %w", dir, err)
 	}
 
 	err = os.WriteFile(output_loc, res, 0644)
 	if err != nil {
-		return err
+		return output_loc, err
 	}
 
-	return nil
+	return output_loc, nil
 }

@@ -28,3 +28,18 @@ func DebugPrint(title string, f func() []string) {
 
 	fmt.Println()
 }
+
+// Apply calls a function if it is not nil.
+//
+// Parameters:
+//   - f: The function to call.
+//
+// Returns:
+//   - error: An error if there is any.
+func Apply(f func()) {
+	if f == nil {
+		return
+	}
+
+	f()
+}

@@ -34,7 +34,7 @@ func init() {
 
 	for _, key := range keys {
 		pos, ok := slices.BinarySearch(GoReservedKeywords, key)
-		luc.AssertOk(ok, "slices.BinarySearch(GoReservedKeywords, %q)", key)
+		luc.AssertOk(!ok, "slices.BinarySearch(GoReservedKeywords, %q)", key)
 
 		GoReservedKeywords = slices.Insert(GoReservedKeywords, pos, key)
 	}

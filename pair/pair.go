@@ -36,7 +36,7 @@ func (p Pair[A, B]) String() string {
 //
 // Returns:
 //   - Pair[A, B]: The new pair.
-func NewPair[A any, B any](first A, second B) Pair[A, B] {
+func NewPair[A, B any](first A, second B) Pair[A, B] {
 	p := Pair[A, B]{
 		First:  first,
 		Second: second,
@@ -52,7 +52,7 @@ func NewPair[A any, B any](first A, second B) Pair[A, B] {
 //
 // Returns:
 //   - []A: The slice of first elements.
-func ExtractFirsts[A any, B any](pairs []Pair[A, B]) []A {
+func ExtractFirsts[A, B any](pairs []Pair[A, B]) []A {
 	if len(pairs) == 0 {
 		return nil
 	}
@@ -73,7 +73,7 @@ func ExtractFirsts[A any, B any](pairs []Pair[A, B]) []A {
 //
 // Returns:
 //   - []B: The slice of second elements.
-func ExtractSeconds[A any, B any](pairs []Pair[A, B]) []B {
+func ExtractSeconds[A, B any](pairs []Pair[A, B]) []B {
 	if len(pairs) == 0 {
 		return nil
 	}

@@ -1,9 +1,18 @@
 package helpers
 
 import (
-	luc "github.com/PlayerR9/lib_units/common"
 	lus "github.com/PlayerR9/lib_units/slices"
 )
+
+// EvalOneFunc is a function that evaluates one element.
+//
+// Parameters:
+//   - elem: The element to evaluate.
+//
+// Returns:
+//   - R: The result of the evaluation.
+//   - error: An error if the evaluation failed.
+type EvalOneFunc[E, R any] func(elem E) (R, error)
 
 // FilterIsSuccess filters any helper that is not successful.
 //
@@ -153,8 +162,8 @@ func SuccessOrFail[T Helperer[O], O any](batch []T, useMax bool) ([]T, bool) {
 //
 // Behaviors:
 //   - This function returns either the successful results or the original slice.
-func EvaluateSimpleHelpers[T any, O any](batch []T, f luc.EvalOneFunc[T, O]) ([]*SimpleHelper[O], bool) {
-	if len(batch) == 0 {
+func EvaluateSimpleHelpers[T, O any](batch []T, f EvalOneFunc[T, O]) ([]*SimpleHelper[O], bool) {
+	if len(batch) == 0 || f == nil {
 		return nil, true
 	}
 
@@ -195,8 +204,8 @@ func EvaluateSimpleHelpers[T any, O any](batch []T, f luc.EvalOneFunc[T, O]) ([]
 //
 // Behaviors:
 //   - This function returns either the successful results or the original slice.
-func EvaluateWeightHelpers[T any, O any](batch []T, f luc.EvalOneFunc[T, O], wf WeightFunc[T], useMax bool) ([]*WeightedHelper[O], bool) {
-	if len(batch) == 0 {
+func EvaluateWeightHelpers[T, O any](batch []T, f EvalOneFunc[T, O], wf WeightFunc[T], useMax bool) ([]*WeightedHelper[O], bool) {
+	if len(batch) == 0 || f == nil || wf == nil {
 		return nil, true
 	}
 

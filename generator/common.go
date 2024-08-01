@@ -11,6 +11,7 @@ import (
 	"unicode/utf8"
 
 	luc "github.com/PlayerR9/lib_units/common"
+	luint "github.com/PlayerR9/lib_units/ints"
 	lus "github.com/PlayerR9/lib_units/slices"
 )
 
@@ -109,7 +110,7 @@ func ParseGenerics(str string) ([]rune, error) {
 		for i, field := range fields {
 			letter, err := IsGenericsID(field)
 			if err != nil {
-				err := luc.NewErrAt(i+1, "field", err)
+				err := luint.NewErrAt(i+1, "field", err)
 				return nil, err
 			}
 

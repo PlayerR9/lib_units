@@ -7,6 +7,7 @@ import (
 	"unicode/utf8"
 
 	luc "github.com/PlayerR9/lib_units/common"
+	luint "github.com/PlayerR9/lib_units/ints"
 )
 
 // BytesToUtf8 is a function that converts bytes to runes.
@@ -428,7 +429,7 @@ func NewLevenshteinTable(words ...string) (*LavenshteinTable, error) {
 	for i, word := range words {
 		err := lt.AddWord(word)
 		if err != nil {
-			return nil, luc.NewErrAt(i+1, word, err)
+			return nil, luint.NewErrAt(i+1, word, err)
 		}
 	}
 

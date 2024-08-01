@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	luc "github.com/PlayerR9/lib_units/common"
+	luint "github.com/PlayerR9/lib_units/ints"
 )
 
 // Serieser is an interface for series.
@@ -71,13 +72,13 @@ func CalculateConvergence(series Serieser, upperLimit int, delta int) (values []
 	for i := 0; i < upperLimit-delta; i++ {
 		ithTerm, reason := series.Term(i)
 		if reason != nil {
-			err = luc.NewErrAt(i+1, "term", reason)
+			err = luint.NewErrAt(i+1, "term", reason)
 			return
 		}
 
 		ithPlusDeltaTerm, reason := series.Term(i + delta)
 		if reason != nil {
-			err = luc.NewErrAt(i+delta+1, "term", reason)
+			err = luint.NewErrAt(i+delta+1, "term", reason)
 			return
 		}
 

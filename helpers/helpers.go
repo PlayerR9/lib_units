@@ -5,9 +5,20 @@
 // implemented.
 package helpers
 
-import (
-	luc "github.com/PlayerR9/lib_units/common"
-)
+// DoFunc is a generic type that represents a function that takes a value
+// and does something with it.
+//
+// Parameters:
+//   - T: The type of the value.
+type DoFunc[T any] func(T)
+
+// DualDoFunc is a generic type that represents a function that takes two
+// values and does something with them.
+//
+// Parameters:
+//   - T: The type of the first value.
+//   - U: The type of the second value.
+type DualDoFunc[T, U any] func(T, U)
 
 // Helper is an interface that represents a helper.
 type Helperer[O any] interface {
@@ -30,8 +41,8 @@ type Helperer[O any] interface {
 // Parameters:
 //   - S: slice of helpers.
 //   - f: the function to execute.
-func DoIfSuccess[T Helperer[O], O any](S []T, f luc.DoFunc[O]) {
-	if len(S) == 0 {
+func DoIfSuccess[T Helperer[O], O any](S []T, f DoFunc[O]) {
+	if len(S) == 0 || f == nil {
 		return
 	}
 
@@ -48,8 +59,8 @@ func DoIfSuccess[T Helperer[O], O any](S []T, f luc.DoFunc[O]) {
 // Parameters:
 //   - S: slice of helpers.
 //   - f: the function to execute.
-func DoIfFailure[T Helperer[O], O any](S []T, f luc.DualDoFunc[O, error]) {
-	if len(S) == 0 {
+func DoIfFailure[T Helperer[O], O any](S []T, f DualDoFunc[O, error]) {
+	if len(S) == 0 || f == nil {
 		return
 	}
 

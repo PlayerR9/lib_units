@@ -10,6 +10,7 @@ import (
 	"unicode"
 
 	luc "github.com/PlayerR9/lib_units/common"
+	luint "github.com/PlayerR9/lib_units/ints"
 	maps "github.com/PlayerR9/lib_units/maps"
 )
 
@@ -177,11 +178,11 @@ func (s *StructFieldsVal) Set(value string) error {
 
 		if len(sub_fields) == 1 {
 			reason := errors.New("missing type")
-			err := luc.NewErrAt(i+1, "field", reason)
+			err := luint.NewErrAt(i+1, "field", reason)
 			return err
 		} else if len(sub_fields) > 2 {
 			reason := errors.New("too many fields")
-			err := luc.NewErrAt(i+1, "field", reason)
+			err := luint.NewErrAt(i+1, "field", reason)
 			return err
 		}
 
@@ -367,12 +368,12 @@ func (s *GenericsSignVal) Set(value string) error {
 
 		letter, g_type, err := parse_generics_value(field)
 		if err != nil {
-			return luc.NewErrAt(i+1, "field", err)
+			return luint.NewErrAt(i+1, "field", err)
 		}
 
 		err = s.add(letter, g_type)
 		if err != nil {
-			return luc.NewErrAt(i+1, "field", err)
+			return luint.NewErrAt(i+1, "field", err)
 		}
 	}
 

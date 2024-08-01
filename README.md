@@ -125,7 +125,7 @@ func main() {
 	// 2. Do some validation.
 
    // 3. Generate the code.
-   err = my_generator.Generate(
+   data, err := my_generator.Generate(
       "foo", "_template.go",
       &GenData{
          // Initialize here the initial values of the struct that will be used in the template.
@@ -134,6 +134,8 @@ func main() {
 	if err != nil {
 		// Handle the error.
 	}
+
+   // 4. Print the generated code to either stdout or a file.
 }
 ```
 
@@ -145,7 +147,7 @@ func main() {
 A common way to handle errors is to log them with the `log.Fatalf()` function. Because of that, I provided the `InitLogger()` function that initializes a common logger.
 
 ```go
-my_logger := ggen.InitLogger("my_logger")
+my_logger := ggen.InitLogger(os.Stdout, "my_logger")
 ```
 
 This code will create a new logger that will print the file and line number where the error occurred. This is equivalent to do as follows:

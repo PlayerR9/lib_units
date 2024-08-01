@@ -5,9 +5,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
-	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 	"text/template"
@@ -21,13 +20,19 @@ import (
 // InitLogger initializes the logger with the given prefix.
 //
 // Parameters:
+//   - out: The output stream to use for the logger.
 //   - prefix: The prefix to use for the logger.
 //
 // Returns:
-//   - *log.Logger: The initialized logger. Never nil.
+//   - *log.Logger: The initialized logger.
 //
-// If the prefix is empty, it defaults to "go_generator".
-func InitLogger(prefix string) *log.Logger {
+// If the prefix is empty, it defaults to "go_generator". If out is nil, then
+// it returns nil.
+func InitLogger(out io.Writer, prefix string) *log.Logger {
+	if out == nil {
+		return nil
+	}
+
 	if prefix == "" {
 		prefix = "go_generator"
 	}
@@ -40,7 +45,7 @@ func InitLogger(prefix string) *log.Logger {
 
 	logger_prefix := builder.String()
 
-	logger := log.New(os.Stdout, logger_prefix, log.Lshortfile)
+	logger := log.New(out, logger_prefix, log.Lshortfile)
 	return logger
 }
 
@@ -211,6 +216,11 @@ func (cg *CodeGenerator[T]) AddDoFunc(do_func DoFunc[T]) {
 	cg.do_funcs = append(cg.do_funcs, do_func)
 }
 
+type Generated struct {
+	DestLoc string
+	Data    []byte
+}
+
 // Generate generates code using the given generator and writes it to the given destination file.
 //
 // WARNING:
@@ -229,21 +239,25 @@ func (cg *CodeGenerator[T]) AddDoFunc(do_func DoFunc[T]) {
 // Errors:
 //   - *common.ErrInvalidParameter: If the file_name or suffix is an empty string.
 //   - error: Any other type of error that may have occurred.
-func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) (string, error) {
+func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) (*Generated, error) {
 	dbg.AssertNil(cg.templ, "cg.templ")
 
 	// NOTES: By extracting FixOutputLoc and FixImportDir to a separate function,
 	// we can remove the dependency on the Generater interface. Suggested to do so
 	// as part of the refactoring.
 
+	g := &Generated{}
+
 	output_loc, err := FixOutputLoc(file_name, suffix)
 	if err != nil {
-		return output_loc, fmt.Errorf("failed to fix output location: %w", err)
+		return g, fmt.Errorf("failed to fix output location: %w", err)
 	}
+
+	g.DestLoc = output_loc
 
 	pkg_name, err := FixImportDir(output_loc)
 	if err != nil {
-		return output_loc, fmt.Errorf("failed to fix import path: %w", err)
+		return g, fmt.Errorf("failed to fix import path: %w", err)
 	}
 
 	data.SetPackageName(pkg_name)
@@ -255,7 +269,7 @@ func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) (string, 
 
 		err := f(data)
 		if err != nil {
-			return output_loc, err
+			return g, err
 		}
 	}
 
@@ -263,22 +277,10 @@ func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) (string, 
 
 	err = cg.templ.Execute(&buff, data)
 	if err != nil {
-		return output_loc, err
+		return g, err
 	}
 
-	res := buff.Bytes()
+	g.Data = buff.Bytes()
 
-	dir := filepath.Dir(output_loc)
-
-	err = os.MkdirAll(dir, 0755)
-	if err != nil {
-		return output_loc, fmt.Errorf("failed to create directory %s: %w", dir, err)
-	}
-
-	err = os.WriteFile(output_loc, res, 0644)
-	if err != nil {
-		return output_loc, err
-	}
-
-	return output_loc, nil
+	return g, nil
 }

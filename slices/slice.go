@@ -3,7 +3,6 @@ package slices
 import (
 	"cmp"
 
-	luc "github.com/PlayerR9/lib_units/common"
 	"golang.org/x/exp/slices"
 )
 
@@ -37,7 +36,7 @@ func Find[T comparable](S []T, elem T) int {
 //
 // Returns:
 //   - int: index of the first occurrence of the element or -1 if not found.
-func FindEquals[T luc.Equaler](S []T, elem T) int {
+func FindEquals[T Equaler](S []T, elem T) int {
 	if len(S) == 0 {
 		return -1
 	}
@@ -105,7 +104,7 @@ func Uniquefy[T comparable](S []T, prioritizeFirst bool) []T {
 //
 // Returns:
 //   - []T: slice of elements with duplicates removed.
-func uniquefyLeft[T luc.Equaler](S []T) []T {
+func uniquefyLeft[T Equaler](S []T) []T {
 	if len(S) < 2 {
 		return S
 	}
@@ -141,7 +140,7 @@ func uniquefyLeft[T luc.Equaler](S []T) []T {
 // Behavior:
 //   - The function preserves the order of the elements in the slice.
 //   - This can modify the original slice.
-func UniquefyEquals[T luc.Equaler](S []T, prioritizeFirst bool) []T {
+func UniquefyEquals[T Equaler](S []T, prioritizeFirst bool) []T {
 	if len(S) < 2 {
 		return S
 	}
@@ -207,7 +206,7 @@ func MergeUnique[T comparable](S1, S2 []T) []T {
 //
 // Behaviors:
 //   - The function does preserve the order of the elements in the slices.
-func MergeUniqueEquals[T luc.Equaler](S1, S2 []T) []T {
+func MergeUniqueEquals[T Equaler](S1, S2 []T) []T {
 	S1 = UniquefyEquals(S1, true)
 	S2 = UniquefyEquals(S2, true)
 
@@ -268,7 +267,7 @@ func IndexOfDuplicate[T comparable](S []T) int {
 //
 // Returns:
 //   - int: index of the first duplicate element or -1 if there are no duplicates.
-func IndexOfDuplicateEquals[T luc.Equaler](S []T) int {
+func IndexOfDuplicateEquals[T Equaler](S []T) int {
 	if len(S) < 2 {
 		return -1
 	}
@@ -386,7 +385,7 @@ func FindSubsliceFrom[T comparable](S []T, subS []T, at int) int {
 //   - The lps array is used to store the length of the longest prefix
 //     that is also a suffix for each index in the subslice.
 //   - The first element of the lps array is always 0.
-func computeLPSArrayEquals[T luc.Equaler](subS []T, lps []int) {
+func computeLPSArrayEquals[T Equaler](subS []T, lps []int) {
 	length := 0
 	i := 1
 	lps[0] = 0 // lps[0] is always 0
@@ -425,7 +424,7 @@ func computeLPSArrayEquals[T luc.Equaler](subS []T, lps []int) {
 //   - If S or subS is empty, the function returns -1.
 //   - If the subslice is not found, the function returns -1.
 //   - If at is negative, it is set to 0.
-func FindSubsliceFromEquals[T luc.Equaler](S []T, subS []T, at int) int {
+func FindSubsliceFromEquals[T Equaler](S []T, subS []T, at int) int {
 	if len(subS) == 0 || len(S) == 0 || at+len(subS) > len(S) {
 		return -1
 	}

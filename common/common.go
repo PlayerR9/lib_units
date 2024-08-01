@@ -15,8 +15,6 @@ type Unwrapper interface {
 	// Parameters:
 	//   - reason: The new reason of the error.
 	ChangeReason(reason error)
-
-	error
 }
 
 // Is is function that checks if an error is of type T.

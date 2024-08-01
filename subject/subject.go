@@ -2,8 +2,6 @@ package Observing
 
 import (
 	"sync"
-
-	luc "github.com/PlayerR9/lib_units/common"
 )
 
 // Subject is the subject that observers observe.
@@ -16,19 +14,6 @@ type Subject[T any] struct {
 
 	// mu is the mutex to synchronize access to the subject.
 	mu sync.RWMutex
-}
-
-// Copy implements the Copier interface.
-//
-// However, the obsevers are not copied.
-func (s *Subject[T]) Copy() luc.Copier {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	return &Subject[T]{
-		observers: make([]Observer[T], 0),
-		state:     s.state,
-	}
 }
 
 // NewSubject creates a new subject.
@@ -158,4 +143,21 @@ func (s *Subject[T]) SetObserver(action func(T)) {
 	defer s.mu.Unlock()
 
 	s.observers = append(s.observers, NewReactiveObserver(action))
+}
+
+// Copy creates a shallow copy of the subject.
+//
+// Returns:
+//   - *Subject[T]: A shallow copy of the subject. Never returns nil.
+//
+// It is important to note that the observers are not copied and so,
+// they have to be reattached to the new subject.
+func (s *Subject[T]) Copy() *Subject[T] {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return &Subject[T]{
+		observers: make([]Observer[T], 0),
+		state:     s.state,
+	}
 }

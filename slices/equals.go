@@ -1,4 +1,4 @@
-package common
+package slices
 
 // Equaler is an interface that defines a method to compare two objects of the
 // same type for equality.

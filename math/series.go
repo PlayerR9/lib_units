@@ -64,6 +64,10 @@ func ApproximateConvergence(values []*big.Float, n int) (*big.Float, error) {
 //   - *ConvergenceResult: The convergence result.
 //   - error: An error if the calculation fails.
 func CalculateConvergence(series Serieser, upperLimit int, delta int) (values []*big.Float, err error) {
+	if series == nil {
+		return nil, luc.NewErrNilParameter("series")
+	}
+
 	for i := 0; i < upperLimit-delta; i++ {
 		ithTerm, reason := series.Term(i)
 		if reason != nil {

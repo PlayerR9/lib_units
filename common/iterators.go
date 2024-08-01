@@ -2,46 +2,6 @@ package common
 
 import "errors"
 
-// Slicer is an interface that provides a method to convert a data structure to a slice.
-type Slicer[T any] interface {
-	// Slice returns a slice containing all the elements in the data structure.
-	//
-	// Returns:
-	//   - []T: A slice containing all the elements in the data structure.
-	Slice() []T
-
-	Iterable[T]
-}
-
-// SliceOf converts any type to a slice of elements of the same type.
-//
-// Parameters:
-//   - elem: The element to convert to a slice.
-//
-// Returns:
-//   - []T: The slice representation of the element.
-//
-// Behaviors:
-//   - Nil elements are converted to nil slices.
-//   - Slice elements are returned as is.
-//   - Slicer elements have their Slice method called.
-//   - Other elements are converted to slices containing a single element.
-func SliceOf[T any](elem any) []T {
-	if elem == nil {
-		return nil
-	}
-
-	switch elem := elem.(type) {
-	case []T:
-		return elem
-	case Slicer[T]:
-		slice := elem.Slice()
-		return slice
-	default:
-		return []T{elem.(T)}
-	}
-}
-
 // Iterable is an interface that defines a method to get an iterator over a
 // collection of elements of type T. It is implemented by data structures that
 // can be iterated over.

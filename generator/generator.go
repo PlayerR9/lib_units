@@ -230,6 +230,10 @@ func (cg *CodeGenerator[T]) AddDoFunc(do_func DoFunc[T]) {
 func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) (string, error) {
 	luc.AssertNil(cg.templ, "cg.templ")
 
+	// NOTES: By extracting FixOutputLoc and FixImportDir to a separate function,
+	// we can remove the dependency on the Generater interface. Suggested to do so
+	// as part of the refactoring.
+
 	output_loc, err := FixOutputLoc(file_name, suffix)
 	if err != nil {
 		return output_loc, fmt.Errorf("failed to fix output location: %w", err)

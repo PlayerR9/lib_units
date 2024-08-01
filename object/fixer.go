@@ -93,7 +93,7 @@ func CleanSliceOf[T any](elems []T) []T {
 //
 // Returns:
 //   - map[K]V: The cleaned map of elements.
-func CleanMap[K comparable, V Cleaner](elems map[K]V) map[K]V {
+func CleanMap[K comparable, V Cleaner](elems map[K]Cleaner) map[K]V {
 	if elems == nil {
 		return nil
 	}

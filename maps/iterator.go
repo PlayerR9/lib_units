@@ -6,6 +6,8 @@ import (
 
 	luc "github.com/PlayerR9/lib_units/common"
 	lustr "github.com/PlayerR9/lib_units/strings"
+
+	dbg "github.com/PlayerR9/lib_units/debug"
 )
 
 // Entry is a key-value pair in an OrderedMap.
@@ -28,7 +30,7 @@ type OMIterator[K cmp.Ordered, V any] struct {
 
 // Consume implements the common.Iterater interface.
 func (i *OMIterator[K, V]) Consume() (*Entry[K, V], error) {
-	luc.AssertNil(i.m, "i.m")
+	dbg.AssertNil(i.m, "i.m")
 
 	if i.pos >= len(i.m.keys) {
 		return nil, luc.NewErrExhaustedIter()
@@ -38,7 +40,7 @@ func (i *OMIterator[K, V]) Consume() (*Entry[K, V], error) {
 	i.pos++
 
 	val, ok := i.m.values[key]
-	luc.AssertOk(ok, "i.m.values[%s]", strconv.Quote(lustr.GoStringOf(key)))
+	dbg.AssertOk(ok, "i.m.values[%s]", strconv.Quote(lustr.GoStringOf(key)))
 
 	return &Entry[K, V]{
 		Key:   key,

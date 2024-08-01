@@ -14,6 +14,8 @@ import (
 
 	luc "github.com/PlayerR9/lib_units/common"
 	lus "github.com/PlayerR9/lib_units/slices"
+
+	dbg "github.com/PlayerR9/lib_units/debug"
 )
 
 // InitLogger initializes the logger with the given prefix.
@@ -71,7 +73,7 @@ func align_generics(fv *StructFieldsVal, tv *TypeListVal, gv *GenericsSignVal) e
 
 	if fv != nil {
 		iter := fv.generics.KeyIterator()
-		luc.Assert(iter != nil, "iter must not be nil")
+		dbg.Assert(iter != nil, "iter must not be nil")
 
 		for {
 			id, err := iter.Consume()
@@ -85,7 +87,7 @@ func align_generics(fv *StructFieldsVal, tv *TypeListVal, gv *GenericsSignVal) e
 
 	if tv != nil {
 		iter := tv.generics.KeyIterator()
-		luc.Assert(iter != nil, "iter must not be nil")
+		dbg.Assert(iter != nil, "iter must not be nil")
 
 		for {
 			id, err := iter.Consume()
@@ -187,7 +189,7 @@ func NewCodeGeneratorFromTemplate[T Generater](name, templ string) (*CodeGenerat
 		return nil, luc.NewErrInvalidParameter("templ", err)
 	}
 
-	luc.AssertNil(t, "t")
+	dbg.AssertNil(t, "t")
 
 	return &CodeGenerator[T]{
 		templ:    t,
@@ -228,7 +230,7 @@ func (cg *CodeGenerator[T]) AddDoFunc(do_func DoFunc[T]) {
 //   - *common.ErrInvalidParameter: If the file_name or suffix is an empty string.
 //   - error: Any other type of error that may have occurred.
 func (cg *CodeGenerator[T]) Generate(file_name, suffix string, data T) (string, error) {
-	luc.AssertNil(cg.templ, "cg.templ")
+	dbg.AssertNil(cg.templ, "cg.templ")
 
 	// NOTES: By extracting FixOutputLoc and FixImportDir to a separate function,
 	// we can remove the dependency on the Generater interface. Suggested to do so

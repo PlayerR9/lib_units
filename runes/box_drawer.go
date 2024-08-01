@@ -4,6 +4,8 @@ import (
 	"errors"
 
 	luc "github.com/PlayerR9/lib_units/common"
+
+	dbg "github.com/PlayerR9/lib_units/debug"
 )
 
 var (
@@ -183,8 +185,8 @@ func (bs *BoxStyle) SideBorder() rune {
 //   - width >= 0
 //   - side_border != 0
 func make_empty_row(width int, side_border rune) []rune {
-	luc.AssertParam("width", width >= 0, luc.NewErrGTE(0))
-	luc.AssertParam("side_border", side_border != 0, errors.New("side_border cannot be \\0"))
+	dbg.AssertParam("width", width >= 0, luc.NewErrGTE(0))
+	dbg.AssertParam("side_border", side_border != 0, errors.New("side_border cannot be \\0"))
 
 	empty_row := make([]rune, 0, width)
 	for i := 0; i < width; i++ {
@@ -205,7 +207,7 @@ func make_empty_row(width int, side_border rune) []rune {
 // Returns:
 //   - []rune: The side padding.
 func make_side_padding(width int) []rune {
-	luc.AssertParam("width", width >= 0, luc.NewErrGTE(0))
+	dbg.AssertParam("width", width >= 0, luc.NewErrGTE(0))
 
 	side_padding := make([]rune, 0, width)
 	for i := 0; i < width; i++ {
@@ -232,10 +234,10 @@ func make_side_padding(width int) []rune {
 //   - left_corner != 0
 //   - right_corner != 0
 func make_tb_border(width int, border, left_corner, right_corner rune) []rune {
-	luc.AssertParam("width", width >= 0, luc.NewErrGTE(0))
-	luc.AssertParam("border", border != 0, errors.New("border cannot be \\0"))
-	luc.AssertParam("left_corner", left_corner != 0, errors.New("left_corner cannot be \\0"))
-	luc.AssertParam("right_corner", right_corner != 0, errors.New("right_corner cannot be \\0"))
+	dbg.AssertParam("width", width >= 0, luc.NewErrGTE(0))
+	dbg.AssertParam("border", border != 0, errors.New("border cannot be \\0"))
+	dbg.AssertParam("left_corner", left_corner != 0, errors.New("left_corner cannot be \\0"))
+	dbg.AssertParam("right_corner", right_corner != 0, errors.New("right_corner cannot be \\0"))
 
 	row := make([]rune, 0, width+2)
 

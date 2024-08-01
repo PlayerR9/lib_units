@@ -8,6 +8,8 @@ import (
 
 	luc "github.com/PlayerR9/lib_units/common"
 	us "github.com/PlayerR9/lib_units/slices"
+
+	dbg "github.com/PlayerR9/lib_units/debug"
 )
 
 // WordMatcher is the word matcher.
@@ -46,12 +48,12 @@ func (wm *WordMatcher) AddWord(word string) error {
 		return err
 	}
 
-	luc.Assert(len(chars) > 0, "chars is empty")
+	dbg.Assert(len(chars) > 0, "chars is empty")
 
 	var indices []int
 
 	for i, w := range wm.words {
-		luc.Assert(len(w) > 0, "word is empty")
+		dbg.Assert(len(w) > 0, "word is empty")
 
 		if len(w) == len(chars) && w[0] == chars[0] {
 			indices = append(indices, i)
@@ -111,7 +113,7 @@ func (wm *WordMatcher) Match(is CharStream) (string, error) {
 			size := utf8.RuneCountInString(word)
 			for i := size; i < next_count; i++ {
 				ok := is.Refuse()
-				luc.AssertOk(ok, "is.Refuse()")
+				dbg.AssertOk(ok, "is.Refuse()")
 			}
 
 			if err != nil {
@@ -128,7 +130,7 @@ func (wm *WordMatcher) Match(is CharStream) (string, error) {
 			size := utf8.RuneCountInString(word)
 			for i := size; i < next_count; i++ {
 				ok := is.Refuse()
-				luc.AssertOk(ok, "is.Refuse()")
+				dbg.AssertOk(ok, "is.Refuse()")
 			}
 
 			if err != nil {
@@ -180,7 +182,7 @@ type matcher struct {
 // Returns:
 //   - bool: True if the matching process cannot continue. False otherwise.
 func (m *matcher) match(char rune) bool {
-	luc.Assert(len(m.indices) > 0, "m.indices is empty")
+	dbg.Assert(len(m.indices) > 0, "m.indices is empty")
 
 	var top int
 
@@ -188,7 +190,7 @@ func (m *matcher) match(char rune) bool {
 		idx := m.indices[i]
 
 		word, ok := m.wm.get_word_at(idx)
-		luc.AssertOk(ok, "wm.get_word_at(%d)", idx)
+		dbg.AssertOk(ok, "wm.get_word_at(%d)", idx)
 
 		if m.pos >= len(word) || word[m.pos] == char {
 			m.indices[top] = idx
@@ -219,7 +221,7 @@ func (m *matcher) get_sol() (string, error) {
 		// Try with the words that were not discarded yet.
 		for _, idx := range m.indices {
 			word, ok := m.wm.get_word_at(idx)
-			luc.AssertOk(ok, "wm.get_word_at(%d)", idx)
+			dbg.AssertOk(ok, "wm.get_word_at(%d)", idx)
 
 			if len(word) <= m.pos {
 				indices = append(indices, idx)
@@ -242,7 +244,7 @@ func (m *matcher) get_sol() (string, error) {
 
 	for _, idx := range indices {
 		word, ok := m.wm.get_word_at(idx)
-		luc.AssertOk(ok, "wm.get_word_at(%d)", idx)
+		dbg.AssertOk(ok, "wm.get_word_at(%d)", idx)
 
 		if len(max_idx) == 0 || len(word) > max_len {
 			max_len = len(word)
@@ -257,7 +259,7 @@ func (m *matcher) get_sol() (string, error) {
 
 		for _, idx := range max_idx {
 			word, ok := m.wm.get_word_at(idx)
-			luc.AssertOk(ok, "wm.get_word_at(%d)", idx)
+			dbg.AssertOk(ok, "wm.get_word_at(%d)", idx)
 
 			values = append(values, string(word))
 		}
@@ -266,7 +268,7 @@ func (m *matcher) get_sol() (string, error) {
 	}
 
 	word, ok := m.wm.get_word_at(max_idx[0])
-	luc.AssertOk(ok, "wm.get_word_at(%d)", max_idx[0])
+	dbg.AssertOk(ok, "wm.get_word_at(%d)", max_idx[0])
 
 	return string(word), nil
 }
@@ -298,7 +300,7 @@ func MultiMatcher(chars []rune, stream CharStream) (string, error) {
 		if !ok {
 			for size > 0 {
 				ok := stream.Refuse()
-				luc.Assert(ok, "stream.Refuse()")
+				dbg.Assert(ok, "stream.Refuse()")
 			}
 
 			return "", fmt.Errorf("expected '%c', got nothing instead", c)
@@ -309,7 +311,7 @@ func MultiMatcher(chars []rune, stream CharStream) (string, error) {
 		if char != c {
 			for size > 0 {
 				ok := stream.Refuse()
-				luc.Assert(ok, "stream.Refuse()")
+				dbg.Assert(ok, "stream.Refuse()")
 			}
 
 			return "", fmt.Errorf("expected '%c', got '%c' instead", c, char)

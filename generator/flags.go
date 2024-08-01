@@ -12,6 +12,8 @@ import (
 	luc "github.com/PlayerR9/lib_units/common"
 	luint "github.com/PlayerR9/lib_units/ints"
 	maps "github.com/PlayerR9/lib_units/maps"
+
+	dbg "github.com/PlayerR9/lib_units/debug"
 )
 
 var (
@@ -135,7 +137,7 @@ func (s *StructFieldsVal) String() string {
 	var builder strings.Builder
 
 	iter := s.fields.Iterator()
-	luc.Assert(iter != nil, "entry iterator is nil")
+	dbg.Assert(iter != nil, "entry iterator is nil")
 
 	for {
 		entry, err := iter.Consume()
@@ -212,7 +214,7 @@ func (s *StructFieldsVal) Set(value string) error {
 
 		for _, char := range chars {
 			ok := s.generics.Add(char, "", false)
-			luc.AssertOk(ok, "s.generics.Add(%s, %q, false)", strconv.QuoteRune(char), "")
+			dbg.AssertOk(ok, "s.generics.Add(%s, %q, false)", strconv.QuoteRune(char), "")
 		}
 	}
 
@@ -466,7 +468,7 @@ func SetGenericsSignFlag(flag_name string, is_required bool, count int) {
 // Assertions:
 //   - field != ""
 func parse_generics_value(field string) (rune, string, error) {
-	luc.Assert(field != "", "field must not be an empty string")
+	dbg.Assert(field != "", "field must not be an empty string")
 
 	sub_fields := strings.Split(field, "/")
 
@@ -501,8 +503,8 @@ func parse_generics_value(field string) (rune, string, error) {
 //   - letter is an upper case letter.
 //   - g_type != ""
 func (gv *GenericsSignVal) add(letter rune, g_type string) error {
-	luc.AssertParam("letter", unicode.IsUpper(letter), errors.New("letter must be an upper case letter"))
-	luc.AssertParam("g_type", g_type != "", errors.New("type must be set"))
+	dbg.AssertParam("letter", unicode.IsUpper(letter), errors.New("letter must be an upper case letter"))
+	dbg.AssertParam("g_type", g_type != "", errors.New("type must be set"))
 
 	pos, ok := slices.BinarySearch(gv.letters, letter)
 	if !ok {
@@ -629,7 +631,7 @@ func (s *TypeListVal) Set(value string) error {
 
 		for _, char := range chars {
 			ok := s.generics.Add(char, "", true)
-			luc.AssertOk(ok, "s.generics.Add(%s, %q, true)", strconv.QuoteRune(char), "")
+			dbg.AssertOk(ok, "s.generics.Add(%s, %q, true)", strconv.QuoteRune(char), "")
 		}
 	}
 

@@ -1,7 +1,8 @@
-package common
+package debug
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -32,8 +33,18 @@ func AssertParam(param string, cond bool, reason error) {
 		return
 	}
 
-	err := NewErrInvalidParameter(param, reason)
-	panic(err.Error())
+	var builder strings.Builder
+
+	builder.WriteString("parameter (")
+	builder.WriteString(strconv.Quote(param))
+	builder.WriteString(") is invalid")
+
+	if reason != nil {
+		builder.WriteString(": ")
+		builder.WriteString(reason.Error())
+	}
+
+	panic(builder.String())
 }
 
 // AssertF panics if the condition is false.
@@ -132,15 +143,13 @@ func AssertDerefNil[T any](elem *T, param_name string) T {
 		return *elem
 	}
 
-	values := []string{
-		"Parameter",
-		"(",
-		strconv.Quote(param_name),
-		")",
-		NewErrNilValue().Error(),
-	}
+	var builder strings.Builder
 
-	panic(strings.Join(values, " "))
+	builder.WriteString("Parameter (")
+	builder.WriteString(strconv.Quote(param_name))
+	builder.WriteString(") must not be nil")
+
+	panic(builder.String())
 }
 
 // AssertNil panics if the element is nil but returns the element dereferenced
@@ -154,20 +163,18 @@ func AssertDerefNil[T any](elem *T, param_name string) T {
 //   - T: The element if it is not nil.
 //
 // The panic message is the message "Parameter \"param_name\" must not be nil".
-func AssertNil[T any](elem *T, param_name string) {
+func AssertNil(elem any, param_name string) {
 	if elem != nil {
 		return
 	}
 
-	values := []string{
-		"Parameter",
-		"(",
-		strconv.Quote(param_name),
-		")",
-		NewErrNilValue().Error(),
-	}
+	var builder strings.Builder
 
-	panic(strings.Join(values, " "))
+	builder.WriteString("Parameter (")
+	builder.WriteString(strconv.Quote(param_name))
+	builder.WriteString(") must not be nil")
+
+	panic(builder.String())
 }
 
 // AssertType panics if the element is not of type T.
@@ -178,18 +185,18 @@ func AssertNil[T any](elem *T, param_name string) {
 //   - var_name: The name of the variable.
 //
 // The panic message is the message "expected <var_name> to be of type <T>, got <elem> instead".
-func AssertType[T any](elem any, allow_nil bool, var_name string) {
+func AssertType(elem any, expected string, allow_nil bool, var_name string) {
 	if elem == nil {
 		if !allow_nil {
-			panic(fmt.Sprintf("expected %q to be of type %T, got nil instead", var_name, *new(T)))
+			panic(fmt.Sprintf("expected %q to be of type %s, got nil instead", var_name, expected))
 		}
 
 		return
 	}
 
-	_, ok := elem.(T)
-	if !ok {
-		panic(fmt.Sprintf("expected %q to be of type %T, got %T instead", var_name, *new(T), elem))
+	to := reflect.TypeOf(elem)
+	if to.String() != expected {
+		panic(fmt.Sprintf("expected %q to be of type %s, got %T instead", var_name, expected, elem))
 	}
 }
 

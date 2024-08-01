@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	luc "github.com/PlayerR9/lib_units/common"
+	dbg "github.com/PlayerR9/lib_units/debug"
 )
 
 // AssertIfZero panics if the element is zero.
@@ -85,7 +85,7 @@ func GetStringOf(type_name string, elem any, custom map[string][]string) Functio
 	}
 
 	to := reflect.TypeOf(elem)
-	luc.Assert(to != nil, "value must be non-nil")
+	dbg.Assert(to != nil, "value must be non-nil")
 
 	if custom != nil {
 		values, ok := custom[type_name]

@@ -13,6 +13,8 @@ import (
 	luc "github.com/PlayerR9/lib_units/common"
 	luint "github.com/PlayerR9/lib_units/ints"
 	lus "github.com/PlayerR9/lib_units/slices"
+
+	dbg "github.com/PlayerR9/lib_units/debug"
 )
 
 const (
@@ -35,7 +37,7 @@ func init() {
 
 	for _, key := range keys {
 		pos, ok := slices.BinarySearch(GoReservedKeywords, key)
-		luc.AssertOk(!ok, "slices.BinarySearch(GoReservedKeywords, %q)", key)
+		dbg.AssertOk(!ok, "slices.BinarySearch(GoReservedKeywords, %q)", key)
 
 		GoReservedKeywords = slices.Insert(GoReservedKeywords, pos, key)
 	}
@@ -443,7 +445,7 @@ func MakeParameterList() (string, error) {
 	var type_list []string
 
 	iter := StructFieldsFlag.fields.Iterator()
-	luc.Assert(iter != nil, "iterator must not be nil")
+	dbg.Assert(iter != nil, "iterator must not be nil")
 
 	for {
 		entry, err := iter.Consume()
@@ -471,7 +473,7 @@ func MakeParameterList() (string, error) {
 		}
 
 		pos, ok := slices.BinarySearch(field_list, entry.Key)
-		luc.AssertF(!ok, "%q must be unique", entry.Key)
+		dbg.AssertF(!ok, "%q must be unique", entry.Key)
 
 		field_list = slices.Insert(field_list, pos, entry.Key)
 		type_list = slices.Insert(type_list, pos, entry.Value)
@@ -520,7 +522,7 @@ func MakeAssignmentList() (map[string]string, error) {
 	var type_list []string
 
 	iter := StructFieldsFlag.fields.Iterator()
-	luc.Assert(iter != nil, "iterator must not be nil")
+	dbg.Assert(iter != nil, "iterator must not be nil")
 
 	for {
 		entry, err := iter.Consume()
@@ -548,7 +550,7 @@ func MakeAssignmentList() (map[string]string, error) {
 		}
 
 		pos, ok := slices.BinarySearch(field_list, entry.Key)
-		luc.AssertF(!ok, "%q must be unique", entry.Key)
+		dbg.AssertF(!ok, "%q must be unique", entry.Key)
 
 		field_list = slices.Insert(field_list, pos, entry.Key)
 		type_list = slices.Insert(type_list, pos, entry.Value)

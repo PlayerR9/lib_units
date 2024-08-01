@@ -134,18 +134,18 @@ func (e *ErrOrSol[T]) HasError() bool {
 	return !e.ignoreErr && len(e.errorList) > 0
 }
 
-// GetErrors returns the list of errors.
+// Errors returns the list of errors.
 //
 // Returns:
 //   - []error: The list of errors.
-func (e *ErrOrSol[T]) GetErrors() []error {
+func (e *ErrOrSol[T]) Errors() []error {
 	return e.errorList
 }
 
-// GetSolutions returns the list of solutions.
+// Solutions returns the list of solutions.
 //
 // Returns:
 //   - []T: The list of solutions.
-func (e *ErrOrSol[T]) GetSolutions() []T {
+func (e *ErrOrSol[T]) Solutions() []T {
 	return e.solutionList
 }

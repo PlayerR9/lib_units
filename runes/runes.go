@@ -455,7 +455,7 @@ func (lt *LavenshteinTable) AddWord(word string) error {
 	return nil
 }
 
-// GetClosest gets the closest word to a target.
+// Closest gets the closest word to a target.
 //
 // Parameters:
 //   - target: The target.
@@ -467,7 +467,7 @@ func (lt *LavenshteinTable) AddWord(word string) error {
 // Errors:
 //   - *common.ErrInvalidParameter: If the target is empty.
 //   - *ErrNoClosestWordFound: If no closest word is found.
-func (lt *LavenshteinTable) GetClosest(target []rune) (string, error) {
+func (lt *LavenshteinTable) Closest(target []rune) (string, error) {
 	if len(target) == 0 {
 		return "", luc.NewErrInvalidParameter("target", luc.NewErrEmpty("slice of runes"))
 	}

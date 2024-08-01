@@ -51,14 +51,14 @@ func NewRuneTable(lines []string) (*RuneTable, error) {
 	return rt, nil
 }
 
-// GetRightMostEdge gets the right most edge of the content.
+// RightMostEdge gets the right most edge of the content.
 //
 // Parameters:
 //   - content: The content.
 //
 // Returns:
 //   - int: The right most edge.
-func (rt *RuneTable) GetRightMostEdge() int {
+func (rt *RuneTable) RightMostEdge() int {
 	var longest_line int
 
 	for _, row := range rt.table {
@@ -75,7 +75,7 @@ func (rt *RuneTable) GetRightMostEdge() int {
 // Returns:
 //   - int: The right most edge.
 func (rt *RuneTable) AlignRightEdge() int {
-	edge := rt.GetRightMostEdge()
+	edge := rt.RightMostEdge()
 
 	for i := 0; i < len(rt.table); i++ {
 		curr_row := rt.table[i]

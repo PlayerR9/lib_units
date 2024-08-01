@@ -11,18 +11,18 @@ import (
 
 // Helper is an interface that represents a helper.
 type Helperer[O any] interface {
-	// GetData returns the data of the element.
+	// Data returns the data of the element.
 	//
 	// Returns:
 	//   - O: The data of the element.
 	//   - error: The reason for the failure.
-	GetData() (O, error)
+	Data() (O, error)
 
-	// GetWeight returns the weight of the element.
+	// Weight returns the weight of the element.
 	//
 	// Returns:
 	//   - float64: The weight of the element.
-	GetWeight() float64
+	Weight() float64
 }
 
 // DoIfSuccess executes a function for each successful helper.
@@ -36,7 +36,7 @@ func DoIfSuccess[T Helperer[O], O any](S []T, f luc.DoFunc[O]) {
 	}
 
 	for _, h := range S {
-		data, err := h.GetData()
+		data, err := h.Data()
 		if err == nil {
 			f(data)
 		}
@@ -54,14 +54,14 @@ func DoIfFailure[T Helperer[O], O any](S []T, f luc.DualDoFunc[O, error]) {
 	}
 
 	for _, h := range S {
-		data, err := h.GetData()
+		data, err := h.Data()
 		if err != nil {
 			f(data, err)
 		}
 	}
 }
 
-// ExtractResults extracts the results from the helpers. Unlike with the GetData
+// ExtractResults extracts the results from the helpers. Unlike with the Data
 // method, this function returns only the results and not the pair of results and
 // errors.
 //
@@ -81,7 +81,7 @@ func ExtractResults[T Helperer[O], O any](S []T) []O {
 	results := make([]O, 0, len(S))
 
 	for _, h := range S {
-		data, _ := h.GetData()
+		data, _ := h.Data()
 
 		results = append(results, data)
 	}
@@ -99,15 +99,15 @@ type SimpleHelper[O any] struct {
 	reason error
 }
 
-// GetData implements the Helperer interface.
-func (h *SimpleHelper[O]) GetData() (O, error) {
+// Data implements the Helperer interface.
+func (h *SimpleHelper[O]) Data() (O, error) {
 	return h.result, h.reason
 }
 
-// GetWeight implements the Helperer interface.
+// Weight implements the Helperer interface.
 //
 // Always returns 0.0.
-func (h *SimpleHelper[O]) GetWeight() float64 {
+func (h *SimpleHelper[O]) Weight() float64 {
 	return 0.0
 }
 
@@ -141,13 +141,13 @@ type WeightedHelper[O any] struct {
 	weight float64
 }
 
-// GetData implements the Helperer interface.
-func (h *WeightedHelper[O]) GetData() (O, error) {
+// Data implements the Helperer interface.
+func (h *WeightedHelper[O]) Data() (O, error) {
 	return h.result, h.reason
 }
 
-// GetWeight implements the Helperer interface.
-func (h *WeightedHelper[O]) GetWeight() float64 {
+// Weight implements the Helperer interface.
+func (h *WeightedHelper[O]) Weight() float64 {
 	return h.weight
 }
 

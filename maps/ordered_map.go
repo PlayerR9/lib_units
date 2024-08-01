@@ -80,10 +80,10 @@ func (m *OrderedMap[K, V]) Size() int {
 	return len(m.keys)
 }
 
-// GetMap is a method that returns the map of the values in the map.
+// Map is a method that returns the map of the values in the map.
 //
 // Returns:
 //   - map[K]V: The map of the values in the map. Never returns nil.
-func (m *OrderedMap[K, V]) GetMap() map[K]V {
+func (m *OrderedMap[K, V]) Map() map[K]V {
 	return m.values
 }

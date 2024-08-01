@@ -295,12 +295,12 @@ func SetStructFieldsFlag(flag_name string, is_required bool, count int, brief st
 	flag.Var(StructFieldsFlag, flag_name, usage.String())
 }
 
-// GetFields returns the fields of the struct.
+// Fields returns the fields of the struct.
 //
 // Returns:
 //   - map[string]string: A map of field names and their types. Never returns nil.
-func (s *StructFieldsVal) GetFields() map[string]string {
-	return s.fields.GetMap()
+func (s *StructFieldsVal) Fields() map[string]string {
+	return s.fields.Map()
 }
 
 // GenericsSignVal is a struct that contains the values of the generics.
@@ -519,7 +519,7 @@ func (gv *GenericsSignVal) add(letter rune, g_type string) error {
 	return nil
 }
 
-// GetSignature returns the signature of the generics.
+// Signature returns the signature of the generics.
 //
 // Format:
 //
@@ -527,7 +527,7 @@ func (gv *GenericsSignVal) add(letter rune, g_type string) error {
 //
 // Returns:
 //   - string: The list of generics.
-func (gv *GenericsSignVal) GetSignature() string {
+func (gv *GenericsSignVal) Signature() string {
 	if len(gv.letters) == 0 {
 		return ""
 	}
@@ -709,7 +709,7 @@ func SetTypeListFlag(flag_name string, is_required bool, count int, brief string
 	flag.Var(TypeListFlag, flag_name, usage.String())
 }
 
-// GetType returns the type at the given index.
+// Type returns the type at the given index.
 //
 // Parameters:
 //   - idx: The index of the type to return.
@@ -717,7 +717,7 @@ func SetTypeListFlag(flag_name string, is_required bool, count int, brief string
 // Return:
 //   - string: The type at the given index.
 //   - error: An error of type *luc.ErrInvalidParameter if the index is out of bounds.
-func (s *TypeListVal) GetType(idx int) (string, error) {
+func (s *TypeListVal) Type(idx int) (string, error) {
 	if idx < 0 || idx >= len(s.types) {
 		return "", luc.NewErrInvalidParameter("idx", luc.NewErrOutOfBounds(idx, 0, len(s.types)))
 	}

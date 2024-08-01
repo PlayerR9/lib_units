@@ -181,7 +181,7 @@ func MakeTypeSig(type_name string, suffix string) (string, error) {
 	}
 
 	if len(GenericsSigFlag.letters) > 0 {
-		str := GenericsSigFlag.GetSignature()
+		str := GenericsSigFlag.Signature()
 		builder.WriteString(str)
 	}
 

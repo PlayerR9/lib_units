@@ -73,11 +73,11 @@ func (s *Subject[T]) Set(state T) {
 	s.NotifyAll()
 }
 
-// Get gets the state of the subject.
+// State gets the state of the subject.
 //
 // Returns:
 //   - T: The state of the subject.
-func (s *Subject[T]) Get() T {
+func (s *Subject[T]) State() T {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 

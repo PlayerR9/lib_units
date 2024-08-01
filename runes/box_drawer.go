@@ -80,11 +80,11 @@ func NewBoxStyle(line_type BoxBorderType, is_heavy bool, padding [4]int) *BoxSty
 	return bs
 }
 
-// GetCorners gets the corners of the box.
+// Corners gets the corners of the box.
 //
 // Returns:
 //   - [4]rune: The corners. [TopLeft, TopRight, BottomLeft, BottomRight]
-func (bs *BoxStyle) GetCorners() [4]rune {
+func (bs *BoxStyle) Corners() [4]rune {
 	var corners [4]rune
 
 	if bs.IsHeavy {
@@ -96,13 +96,13 @@ func (bs *BoxStyle) GetCorners() [4]rune {
 	return corners
 }
 
-// GetTopBorder gets the top border of the box.
+// TopBorder gets the top border of the box.
 //
 // It also applies to the bottom border as they are the same.
 //
 // Returns:
 //   - string: The top border.
-func (bs *BoxStyle) GetTopBorder() rune {
+func (bs *BoxStyle) TopBorder() rune {
 	var tb_border rune
 
 	switch bs.LineType {
@@ -133,13 +133,13 @@ func (bs *BoxStyle) GetTopBorder() rune {
 	return tb_border
 }
 
-// GetSideBorder gets the side border of the box.
+// SideBorder gets the side border of the box.
 //
 // It also applies to the left border as they are the same.
 //
 // Returns:
 //   - string: The side border.
-func (bs *BoxStyle) GetSideBorder() rune {
+func (bs *BoxStyle) SideBorder() rune {
 	var side_border rune
 
 	switch bs.LineType {
@@ -274,11 +274,11 @@ func (bs *BoxStyle) ApplyStrings(content []string) (*RuneTable, error) {
 		}
 	}
 
-	side_border := bs.GetSideBorder()
+	side_border := bs.SideBorder()
 	left_padding := make_side_padding(bs.Padding[3])
 	right_padding := make_side_padding(bs.Padding[1])
-	tbb_char := bs.GetTopBorder()
-	corners := bs.GetCorners()
+	tbb_char := bs.TopBorder()
+	corners := bs.Corners()
 	prefix := append([]rune{side_border}, left_padding...)
 	suffix := append(right_padding, side_border)
 

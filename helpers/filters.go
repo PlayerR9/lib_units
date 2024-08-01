@@ -16,7 +16,7 @@ import (
 // Behaviors:
 //   - It assumes that the h is not nil.
 func FilterIsSuccess[T Helperer[O], O any](h T) bool {
-	_, err := h.GetData()
+	_, err := h.Data()
 	return err == nil
 }
 
@@ -38,11 +38,11 @@ func FilterByPositiveWeight[T Helperer[O], O any](S []T) []T {
 		return nil
 	}
 
-	maxWeight := S[0].GetWeight()
+	maxWeight := S[0].Weight()
 	indices := []int{0}
 
 	for i, e := range S[1:] {
-		currentWeight := e.GetWeight()
+		currentWeight := e.Weight()
 
 		if currentWeight > maxWeight {
 			maxWeight = currentWeight
@@ -79,11 +79,11 @@ func FilterByNegativeWeight[T Helperer[O], O any](S []T) []T {
 		return nil
 	}
 
-	minWeight := S[0].GetWeight()
+	minWeight := S[0].Weight()
 	indices := []int{0}
 
 	for i, e := range S[1:] {
-		currentWeight := e.GetWeight()
+		currentWeight := e.Weight()
 
 		if currentWeight < minWeight {
 			minWeight = currentWeight

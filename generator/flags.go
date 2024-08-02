@@ -269,6 +269,8 @@ func SetStructFieldsFlag(flag_name string, is_required bool, count int, brief st
 	}
 
 	StructFieldsFlag = &StructFieldsVal{
+		fields:      maps.NewOrderedMap[string, string](),
+		generics:    maps.NewOrderedMap[rune, string](),
 		is_required: is_required,
 		count:       count,
 	}
@@ -685,6 +687,7 @@ func SetTypeListFlag(flag_name string, is_required bool, count int, brief string
 		types:       make([]string, 0),
 		is_required: is_required,
 		count:       count,
+		generics:    maps.NewOrderedMap[rune, string](),
 	}
 
 	var usage strings.Builder

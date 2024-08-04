@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"text/template"
@@ -215,9 +217,33 @@ func (cg *CodeGenerator[T]) AddDoFunc(do_func DoFunc[T]) {
 	cg.do_funcs = append(cg.do_funcs, do_func)
 }
 
+// Generated is the type of the generated code.
 type Generated struct {
+	// DestLoc is the destination location of the generated code.
 	DestLoc string
-	Data    []byte
+
+	// Data is the data to use for the generated code.
+	Data []byte
+}
+
+// WriteFile writes the generated code to the destination file.
+//
+// Returns:
+//   - error: An error if occurred.
+func (g *Generated) WriteFile() error {
+	dir := filepath.Dir(g.DestLoc)
+
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(g.DestLoc, g.Data, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Generate generates code using the given generator and writes it to the given destination file.

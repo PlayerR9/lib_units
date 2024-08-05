@@ -723,7 +723,7 @@ func SetTypeListFlag(flag_name string, is_required bool, count int, brief string
 //   - error: An error of type *luc.ErrInvalidParameter if the index is out of bounds.
 func (s *TypeListVal) Type(idx int) (string, error) {
 	if idx < 0 || idx >= len(s.types) {
-		return "", luc.NewErrInvalidParameter("idx", luc.NewErrOutOfBounds(idx, 0, len(s.types)))
+		return "", luc.NewErrInvalidParameter("idx", luint.NewErrOutOfBounds(idx, 0, len(s.types)))
 	}
 
 	return s.types[idx], nil

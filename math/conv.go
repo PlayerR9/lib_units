@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	luc "github.com/PlayerR9/lib_units/common"
+	luint "github.com/PlayerR9/lib_units/ints"
 )
 
 // IsValidNumber checks if the given number is valid for the given base.
@@ -218,7 +219,7 @@ func BaseToDec(n []int, base int) (int, error) {
 
 	for i, digit := range n {
 		if digit < 0 || digit >= base {
-			return 0, luc.NewErrOutOfBounds(digit, 0, base)
+			return 0, luint.NewErrOutOfBounds(digit, 0, base)
 		}
 
 		result += digit * int(math.Pow(float64(base), float64(i)))

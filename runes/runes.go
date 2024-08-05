@@ -8,6 +8,7 @@ import (
 
 	luc "github.com/PlayerR9/lib_units/common"
 	luint "github.com/PlayerR9/lib_units/ints"
+	uters "github.com/PlayerR9/lib_units/util/errors"
 )
 
 // BytesToUtf8 is a function that converts bytes to runes.
@@ -470,7 +471,7 @@ func (lt *LavenshteinTable) AddWord(word string) error {
 //   - *ErrNoClosestWordFound: If no closest word is found.
 func (lt *LavenshteinTable) Closest(target []rune) (string, error) {
 	if len(target) == 0 {
-		return "", luc.NewErrInvalidParameter("target", luc.NewErrEmpty("slice of runes"))
+		return "", luc.NewErrInvalidParameter("target", uters.NewErrEmpty("slice of runes"))
 	}
 
 	target_len := len(target)

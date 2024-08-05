@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	luc "github.com/PlayerR9/lib_units/common"
+	uters "github.com/PlayerR9/lib_units/util/errors"
 )
 
 // GoStringOf returns a string representation of the element.
@@ -151,7 +152,7 @@ func FindContentIndexes(op_token, cl_token string, tokens []string) (result [2]i
 	result[1] = -1
 
 	if cl_token == "" {
-		err = luc.NewErrInvalidParameter("cl_token", luc.NewErrEmpty(cl_token))
+		err = luc.NewErrInvalidParameter("cl_token", uters.NewErrEmpty(cl_token))
 		return
 	}
 

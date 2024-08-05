@@ -1,6 +1,9 @@
 package ints
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
 // ErrWhileAt represents an error that occurs while performing an operation at a specific index.
 type ErrWhileAt struct {
@@ -145,4 +148,108 @@ func NewErrAt(index int, name string, reason error) *ErrAt {
 		Name:   name,
 		Reason: reason,
 	}
+}
+
+// ErrOutOfBounds represents an error when a value is out of a specified range.
+type ErrOutOfBounds struct {
+	// LowerBound and UpperBound are the lower and upper bounds of the range,
+	// respectively.
+	LowerBound, UpperBound int
+
+	// LowerInclusive and UpperInclusive are flags indicating whether the lower
+	// and upper bounds are inclusive, respectively.
+	LowerInclusive, UpperInclusive bool
+
+	// Value is the value that caused the error.
+	Value int
+}
+
+// Error implements the error interface.
+//
+// Message: "value (value) not in range <lowerBound, upperBound>"
+//
+// If the lower bound is inclusive, the message uses square brackets. If the
+// upper bound is inclusive, the message uses square brackets. Otherwise, the
+// message uses parentheses.
+func (e *ErrOutOfBounds) Error() string {
+	left_bound := strconv.Itoa(e.LowerBound)
+	right_bound := strconv.Itoa(e.UpperBound)
+
+	var open, close string
+
+	if e.LowerInclusive {
+		open = "["
+	} else {
+		open = "("
+	}
+
+	if e.UpperInclusive {
+		close = "]"
+	} else {
+		close = ")"
+	}
+
+	values := []string{
+		"value",
+		"(",
+		strconv.Itoa(e.Value),
+		")",
+		"not in range",
+		open,
+		left_bound,
+		",",
+		right_bound,
+		close,
+	}
+
+	str := strings.Join(values, " ")
+
+	return str
+}
+
+// WithLowerBound sets the inclusivity of the lower bound.
+//
+// Parameters:
+//   - isInclusive: A boolean indicating whether the lower bound is inclusive.
+//
+// Returns:
+//   - *ErrOutOfBound: The error instance for chaining.
+func (e *ErrOutOfBounds) WithLowerBound(isInclusive bool) *ErrOutOfBounds {
+	e.LowerInclusive = isInclusive
+
+	return e
+}
+
+// WithUpperBound sets the inclusivity of the upper bound.
+//
+// Parameters:
+//   - isInclusive: A boolean indicating whether the upper bound is inclusive.
+//
+// Returns:
+//   - *ErrOutOfBound: The error instance for chaining.
+func (e *ErrOutOfBounds) WithUpperBound(isInclusive bool) *ErrOutOfBounds {
+	e.UpperInclusive = isInclusive
+
+	return e
+}
+
+// NewOutOfBounds creates a new ErrOutOfBound error. By default, the lower bound
+// is inclusive and the upper bound is exclusive.
+//
+// Parameters:
+//   - lowerBound, upperbound: The lower and upper bounds of the range,
+//     respectively.
+//   - value: The value that caused the error.
+//
+// Returns:
+//   - *ErrOutOfBounds: A pointer to the newly created ErrOutOfBound.
+func NewErrOutOfBounds(value int, lowerBound, upperBound int) *ErrOutOfBounds {
+	e := &ErrOutOfBounds{
+		LowerBound:     lowerBound,
+		UpperBound:     upperBound,
+		LowerInclusive: true,
+		UpperInclusive: false,
+		Value:          value,
+	}
+	return e
 }

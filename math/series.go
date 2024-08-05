@@ -40,7 +40,7 @@ func ApproximateConvergence(values []*big.Float, n int) (*big.Float, error) {
 	} else if len(values) < n {
 		return nil, luc.NewErrInvalidParameter(
 			"n",
-			luc.NewErrOutOfBounds(n, 0, len(values)),
+			luint.NewErrOutOfBounds(n, 0, len(values)),
 		)
 	}
 

@@ -8,7 +8,9 @@ import (
 
 	luc "github.com/PlayerR9/lib_units/common"
 	us "github.com/PlayerR9/lib_units/slices"
+
 	// dbg "github.com/PlayerR9/lib_units/debug"
+	uters "github.com/PlayerR9/lib_units/util/errors"
 )
 
 // WordMatcher is the word matcher.
@@ -288,7 +290,7 @@ func MultiMatcher(chars []rune, stream CharStream) (string, error) {
 	if stream == nil {
 		return "", luc.NewErrNilParameter("stream")
 	} else if len(chars) == 0 {
-		return "", luc.NewErrInvalidParameter("chars", luc.NewErrEmpty("slice of runes"))
+		return "", luc.NewErrInvalidParameter("chars", uters.NewErrEmpty("slice of runes"))
 	}
 
 	var builder strings.Builder

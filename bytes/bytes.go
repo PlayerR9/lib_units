@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	luc "github.com/PlayerR9/lib_units/common"
+
+	uters "github.com/PlayerR9/lib_units/util/errors"
 )
 
 // filter_equals returns the indices of the other in the data.
@@ -136,7 +138,7 @@ func FindContentIndexes(op_token, cl_token []byte, tokens [][]byte) (result [2]i
 	result[1] = -1
 
 	if len(cl_token) == 0 {
-		err = luc.NewErrInvalidParameter("cl_token", luc.NewErrEmpty("slice of bytes"))
+		err = luc.NewErrInvalidParameter("cl_token", uters.NewErrEmpty(cl_token))
 		return
 	}
 

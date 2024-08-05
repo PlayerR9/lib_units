@@ -3,6 +3,7 @@ package runes
 import (
 	gcers "github.com/PlayerR9/go-commons/errors"
 	gcint "github.com/PlayerR9/go-commons/ints"
+	gcch "github.com/PlayerR9/go-commons/runes"
 	luc "github.com/PlayerR9/lib_units/common"
 )
 
@@ -51,7 +52,7 @@ func NewLevenshteinTable(words ...string) (*LavenshteinTable, error) {
 //   - error: An error of type *ErrInvalidUTF8Encoding if the word is not
 //     valid UTF-8.
 func (lt *LavenshteinTable) AddWord(word string) error {
-	chars, err := StringToUtf8(word)
+	chars, err := gcch.StringToUtf8(word)
 	if err != nil {
 		return err
 	}

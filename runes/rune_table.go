@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	gcint "github.com/PlayerR9/go-commons/ints"
+	gcch "github.com/PlayerR9/go-commons/runes"
 )
 
 // RuneTable is a table of runes.
@@ -36,7 +37,7 @@ func NewRuneTable(lines []string) (*RuneTable, error) {
 	table := make([][]rune, 0, len(lines))
 
 	for i, line := range lines {
-		row, err := StringToUtf8(line)
+		row, err := gcch.StringToUtf8(line)
 		if err != nil {
 			return nil, gcint.NewErrAt(i+1, "line", err)
 		}

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	lustr "github.com/PlayerR9/lib_units/strings"
+	gcstr "github.com/PlayerR9/go-commons/strings"
 )
 
 // ErrKeyNotFound is an error that is returned when a key is not found in the
@@ -22,7 +22,7 @@ func (e *ErrKeyNotFound[K]) Error() string {
 	var builder strings.Builder
 
 	builder.WriteString("key (")
-	builder.WriteString(strconv.Quote(lustr.GoStringOf(e.Key)))
+	builder.WriteString(strconv.Quote(gcstr.GoStringOf(e.Key)))
 	builder.WriteString(") not found")
 
 	return builder.String()

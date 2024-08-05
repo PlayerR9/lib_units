@@ -10,6 +10,7 @@ import (
 
 	// dbg "github.com/PlayerR9/lib_units/debug"
 	gcers "github.com/PlayerR9/go-commons/errors"
+	gcch "github.com/PlayerR9/go-commons/runes"
 )
 
 // WordMatcher is the word matcher.
@@ -43,7 +44,7 @@ func (wm *WordMatcher) AddWord(word string) error {
 		return nil
 	}
 
-	chars, err := StringToUtf8(word)
+	chars, err := gcch.StringToUtf8(word)
 	if err != nil {
 		return err
 	}

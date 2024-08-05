@@ -250,25 +250,6 @@ func NewErrUnexpectedType[T any](kind string, elem T) *ErrUnexpectedType[T] {
 	return e
 }
 
-// ErrNilValue represents an error when a value is nil.
-type ErrNilValue struct{}
-
-// Error implements the error interface.
-//
-// Message: "pointer must not be nil"
-func (e *ErrNilValue) Error() string {
-	return "pointer must not be nil"
-}
-
-// NewErrNilValue creates a new ErrNilValue error.
-//
-// Returns:
-//   - *ErrNilValue: The new ErrNilValue error.
-func NewErrNilValue() *ErrNilValue {
-	e := &ErrNilValue{}
-	return e
-}
-
 // ErrExhaustedIter is an error type that is returned when an iterator
 // is exhausted (i.e., there are no more elements to consume).
 type ErrExhaustedIter struct{}

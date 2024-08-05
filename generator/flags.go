@@ -9,9 +9,12 @@ import (
 	"strings"
 
 	luc "github.com/PlayerR9/lib_units/common"
-	luint "github.com/PlayerR9/lib_units/ints"
 	maps "github.com/PlayerR9/lib_units/maps"
+
 	// dbg "github.com/PlayerR9/lib_units/debug"
+
+	gcers "github.com/PlayerR9/go-commons/errors"
+	gcint "github.com/PlayerR9/go-commons/ints"
 )
 
 var (
@@ -178,11 +181,11 @@ func (s *StructFieldsVal) Set(value string) error {
 
 		if len(sub_fields) == 1 {
 			reason := errors.New("missing type")
-			err := luint.NewErrAt(i+1, "field", reason)
+			err := gcint.NewErrAt(i+1, "field", reason)
 			return err
 		} else if len(sub_fields) > 2 {
 			reason := errors.New("too many fields")
-			err := luint.NewErrAt(i+1, "field", reason)
+			err := gcint.NewErrAt(i+1, "field", reason)
 			return err
 		}
 
@@ -370,12 +373,12 @@ func (s *GenericsSignVal) Set(value string) error {
 
 		letter, g_type, err := parse_generics_value(field)
 		if err != nil {
-			return luint.NewErrAt(i+1, "field", err)
+			return gcint.NewErrAt(i+1, "field", err)
 		}
 
 		err = s.add(letter, g_type)
 		if err != nil {
-			return luint.NewErrAt(i+1, "field", err)
+			return gcint.NewErrAt(i+1, "field", err)
 		}
 	}
 
@@ -723,7 +726,7 @@ func SetTypeListFlag(flag_name string, is_required bool, count int, brief string
 //   - error: An error of type *luc.ErrInvalidParameter if the index is out of bounds.
 func (s *TypeListVal) Type(idx int) (string, error) {
 	if idx < 0 || idx >= len(s.types) {
-		return "", luc.NewErrInvalidParameter("idx", luint.NewErrOutOfBounds(idx, 0, len(s.types)))
+		return "", gcers.NewErrInvalidParameter("idx", gcint.NewErrOutOfBounds(idx, 0, len(s.types)))
 	}
 
 	return s.types[idx], nil

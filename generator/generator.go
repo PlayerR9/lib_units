@@ -15,7 +15,10 @@ import (
 
 	luc "github.com/PlayerR9/lib_units/common"
 	lus "github.com/PlayerR9/lib_units/slices"
+
 	// dbg "github.com/PlayerR9/lib_units/debug"
+
+	gcers "github.com/PlayerR9/go-commons/errors"
 )
 
 // InitLogger initializes the logger with the given prefix.
@@ -170,7 +173,7 @@ type CodeGenerator[T Generater] struct {
 //   - error: An error of type *common.ErrInvalidParameter if the templ is nil.
 func NewCodeGenerator[T Generater](templ *template.Template) (*CodeGenerator[T], error) {
 	if templ == nil {
-		return nil, luc.NewErrNilParameter("templ")
+		return nil, gcers.NewErrNilParameter("templ")
 	}
 
 	return &CodeGenerator[T]{
@@ -192,7 +195,7 @@ func NewCodeGenerator[T Generater](templ *template.Template) (*CodeGenerator[T],
 func NewCodeGeneratorFromTemplate[T Generater](name, templ string) (*CodeGenerator[T], error) {
 	t, err := template.New(name).Parse(templ)
 	if err != nil {
-		return nil, luc.NewErrInvalidParameter("templ", err)
+		return nil, gcers.NewErrInvalidParameter("templ", err)
 	}
 
 	// dbg.AssertNil(t, "t")
@@ -224,6 +227,24 @@ type Generated struct {
 
 	// Data is the data to use for the generated code.
 	Data []byte
+}
+
+// ModifyFileName modifies the file name of the generated code.
+//
+// Parameters:
+//   - suffix: The suffix to add to the file name.
+//
+// Useful for when generating multiple files.
+func (g *Generated) ModifyFileName(suffix string) {
+	loc := strings.TrimSuffix(g.DestLoc, ".go")
+
+	var builder strings.Builder
+
+	builder.WriteString(loc)
+	builder.WriteString(suffix)
+	builder.WriteString(".go")
+
+	g.DestLoc = builder.String()
 }
 
 // WriteFile writes the generated code to the destination file.

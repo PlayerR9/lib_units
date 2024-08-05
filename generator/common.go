@@ -11,11 +11,11 @@ import (
 	"unicode/utf8"
 
 	luc "github.com/PlayerR9/lib_units/common"
-	luint "github.com/PlayerR9/lib_units/ints"
 	lus "github.com/PlayerR9/lib_units/slices"
 
 	// dbg "github.com/PlayerR9/lib_units/debug"
-	uters "github.com/PlayerR9/lib_units/util/errors"
+	gcers "github.com/PlayerR9/go-commons/errors"
+	gcint "github.com/PlayerR9/go-commons/ints"
 )
 
 const (
@@ -54,7 +54,7 @@ func init() {
 //   - error: An error of type *ErrInvalidID if the input string is not a valid identifier.
 func IsGenericsID(id string) (rune, error) {
 	if id == "" {
-		return '\000', NewErrInvalidID(id, uters.NewErrEmpty(id))
+		return '\000', NewErrInvalidID(id, gcers.NewErrEmpty(id))
 	}
 
 	size := utf8.RuneCountInString(id)
@@ -89,7 +89,7 @@ func IsGenericsID(id string) (rune, error) {
 //   - error: An error if the string is a possibly valid list of generic types but fails to parse.
 func ParseGenerics(str string) ([]rune, error) {
 	if str == "" {
-		return nil, NewErrNotGeneric(uters.NewErrEmpty(str))
+		return nil, NewErrNotGeneric(gcers.NewErrEmpty(str))
 	}
 
 	var letters []rune
@@ -113,7 +113,7 @@ func ParseGenerics(str string) ([]rune, error) {
 		for i, field := range fields {
 			letter, err := IsGenericsID(field)
 			if err != nil {
-				err := luint.NewErrAt(i+1, "field", err)
+				err := gcint.NewErrAt(i+1, "field", err)
 				return nil, err
 			}
 
@@ -172,7 +172,7 @@ func FixImportDir(dest string) (string, error) {
 //   - error: An error if the type signature cannot be created. (i.e., the type name is empty)
 func MakeTypeSig(type_name string, suffix string) (string, error) {
 	if type_name == "" {
-		return "", luc.NewErrInvalidParameter("type_name", uters.NewErrEmpty(type_name))
+		return "", gcers.NewErrInvalidParameter("type_name", gcers.NewErrEmpty(type_name))
 	}
 
 	var builder strings.Builder
@@ -233,7 +233,7 @@ func FixOutputLoc(file_name, suffix string) (string, error) {
 	output_loc := *OutputLocFlag
 
 	if file_name == "" {
-		return "", luc.NewErrInvalidParameter("type_name", uters.NewErrEmpty(file_name))
+		return "", gcers.NewErrInvalidParameter("type_name", gcers.NewErrEmpty(file_name))
 	}
 
 	var filename string
@@ -303,7 +303,7 @@ const (
 // function does not perform any checks.
 func IsValidName(variable_name string, keywords []string, exported GoExport) error {
 	if variable_name == "" {
-		err := uters.NewErrEmpty(variable_name)
+		err := gcers.NewErrEmpty(variable_name)
 		return err
 	}
 
@@ -356,7 +356,7 @@ func IsValidName(variable_name string, keywords []string, exported GoExport) err
 //   - error: An error if the variable name is invalid.
 func FixVariableName(variable_name string, keywords []string, exported GoExport) (string, error) {
 	if variable_name == "" {
-		err := uters.NewErrEmpty(variable_name)
+		err := gcers.NewErrEmpty(variable_name)
 		return "", err
 	}
 

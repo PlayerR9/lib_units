@@ -4,8 +4,9 @@ import (
 	"math/big"
 	"strings"
 
+	gcers "github.com/PlayerR9/go-commons/errors"
+	gcint "github.com/PlayerR9/go-commons/ints"
 	luc "github.com/PlayerR9/lib_units/common"
-	luint "github.com/PlayerR9/lib_units/ints"
 )
 
 // Serieser is an interface for series.
@@ -36,11 +37,11 @@ type Serieser interface {
 //     there are not enough values to calculate the average.
 func ApproximateConvergence(values []*big.Float, n int) (*big.Float, error) {
 	if n <= 0 {
-		return nil, luc.NewErrInvalidParameter("n", luc.NewErrGT(0))
+		return nil, gcers.NewErrInvalidParameter("n", luc.NewErrGT(0))
 	} else if len(values) < n {
-		return nil, luc.NewErrInvalidParameter(
+		return nil, gcers.NewErrInvalidParameter(
 			"n",
-			luint.NewErrOutOfBounds(n, 0, len(values)),
+			gcint.NewErrOutOfBounds(n, 0, len(values)),
 		)
 	}
 
@@ -66,19 +67,19 @@ func ApproximateConvergence(values []*big.Float, n int) (*big.Float, error) {
 //   - error: An error if the calculation fails.
 func CalculateConvergence(series Serieser, upperLimit int, delta int) (values []*big.Float, err error) {
 	if series == nil {
-		return nil, luc.NewErrNilParameter("series")
+		return nil, gcers.NewErrNilParameter("series")
 	}
 
 	for i := 0; i < upperLimit-delta; i++ {
 		ithTerm, reason := series.Term(i)
 		if reason != nil {
-			err = luint.NewErrAt(i+1, "term", reason)
+			err = gcint.NewErrAt(i+1, "term", reason)
 			return
 		}
 
 		ithPlusDeltaTerm, reason := series.Term(i + delta)
 		if reason != nil {
-			err = luint.NewErrAt(i+delta+1, "term", reason)
+			err = gcint.NewErrAt(i+delta+1, "term", reason)
 			return
 		}
 

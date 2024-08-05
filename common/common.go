@@ -1,6 +1,10 @@
 package common
 
-import "errors"
+import (
+	"errors"
+
+	gcers "github.com/PlayerR9/go-commons/errors"
+)
 
 // Unwrapper is an interface that defines a method to unwrap an error.
 type Unwrapper interface {
@@ -74,7 +78,7 @@ func IsErrIgnorable(err error) bool {
 		return true
 	}
 
-	var invalid *ErrInvalidParameter
+	var invalid *gcers.ErrInvalidParameter
 
 	ok = errors.As(err, &invalid)
 	return ok

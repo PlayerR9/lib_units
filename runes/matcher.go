@@ -6,11 +6,10 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	luc "github.com/PlayerR9/lib_units/common"
 	us "github.com/PlayerR9/lib_units/slices"
 
 	// dbg "github.com/PlayerR9/lib_units/debug"
-	uters "github.com/PlayerR9/lib_units/util/errors"
+	gcers "github.com/PlayerR9/go-commons/errors"
 )
 
 // WordMatcher is the word matcher.
@@ -89,7 +88,7 @@ func (wm *WordMatcher) AddWord(word string) error {
 //   - *common.ErrAt: If the input stream is not a valid UTF-8 stream.
 func (wm *WordMatcher) Match(is CharStream) (string, error) {
 	if is == nil {
-		return "", luc.NewErrNilParameter("is")
+		return "", gcers.NewErrNilParameter("is")
 	}
 
 	indices := make([]int, 0, len(wm.words))
@@ -288,9 +287,9 @@ func (m *matcher) get_sol() (string, error) {
 //   - *common.ErrInvalidParameter: If the input stream is nil or the input characters are empty.
 func MultiMatcher(chars []rune, stream CharStream) (string, error) {
 	if stream == nil {
-		return "", luc.NewErrNilParameter("stream")
+		return "", gcers.NewErrNilParameter("stream")
 	} else if len(chars) == 0 {
-		return "", luc.NewErrInvalidParameter("chars", uters.NewErrEmpty("slice of runes"))
+		return "", gcers.NewErrInvalidParameter("chars", gcers.NewErrEmpty(chars))
 	}
 
 	var builder strings.Builder

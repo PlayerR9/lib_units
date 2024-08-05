@@ -1,3 +1,7 @@
+github.com/PlayerR9/debugging v0.1.0 h1:RxxMXq1IJChEbDZWwRkcvjPtMYNz4gQGi8ZbEF7YNDM=
+github.com/PlayerR9/debugging v0.1.0/go.mod h1:dvAx4bxx4DayFWy7GtyZd8oW2eYjLenLCHAGKOHyFkQ=
+github.com/PlayerR9/go-commons v0.1.0 h1:G9VMX7wUdWyyBWoph29vTcFjaJR+9jY9IxDD58N0J00=
+github.com/PlayerR9/go-commons v0.1.0/go.mod h1:3DEOPnnd4cBE4eZizrLvH0nQ8mx4tgR7RDByKfqQDQo=
 golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 h1:2dVuKD2vS7b0QIHQbpyTISPd0LeHDbnYEryqj5Q1ug8=
 golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56/go.mod h1:M4RDyNAINzryxdtnbRXRL/OHtkFuWGRjvuhBJpk2IlY=
 golang.org/x/tools v0.23.0 h1:SGsXPZ+2l4JsgaCKkx+FQ9YZ5XEtA1GZYuoDjenLjvg=

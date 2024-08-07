@@ -3,9 +3,8 @@ package MathExt
 import (
 	"math/big"
 
-	luc "github.com/PlayerR9/lib_units/common"
-
 	gcers "github.com/PlayerR9/go-commons/errors"
+	gcint "github.com/PlayerR9/go-commons/ints"
 )
 
 // Add adds two numbers of the same base. Both numbers are Least Significant Digit
@@ -80,7 +79,7 @@ func Add(n1, n2 []int, base int) []int {
 //   - *errors.ErrInvalidParameter: The base is less than or equal to 0.
 func Subtract(n1, n2 []int, base int) ([]int, error) {
 	if base <= 0 {
-		return nil, gcers.NewErrInvalidParameter("base", luc.NewErrGT(0))
+		return nil, gcers.NewErrInvalidParameter("base", gcint.NewErrGT(0))
 	}
 
 	if base == 1 {

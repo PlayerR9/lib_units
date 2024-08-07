@@ -6,7 +6,6 @@ import (
 
 	gcers "github.com/PlayerR9/go-commons/errors"
 	gcint "github.com/PlayerR9/go-commons/ints"
-	luc "github.com/PlayerR9/lib_units/common"
 )
 
 // Serieser is an interface for series.
@@ -37,7 +36,7 @@ type Serieser interface {
 //     there are not enough values to calculate the average.
 func ApproximateConvergence(values []*big.Float, n int) (*big.Float, error) {
 	if n <= 0 {
-		return nil, gcers.NewErrInvalidParameter("n", luc.NewErrGT(0))
+		return nil, gcers.NewErrInvalidParameter("n", gcint.NewErrGT(0))
 	} else if len(values) < n {
 		return nil, gcers.NewErrInvalidParameter(
 			"n",

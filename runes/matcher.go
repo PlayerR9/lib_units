@@ -6,11 +6,10 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	us "github.com/PlayerR9/lib_units/slices"
-
 	// dbg "github.com/PlayerR9/lib_units/debug"
 	gcers "github.com/PlayerR9/go-commons/errors"
 	gcch "github.com/PlayerR9/go-commons/runes"
+	gcslc "github.com/PlayerR9/go-commons/slices"
 )
 
 // WordMatcher is the word matcher.
@@ -66,7 +65,7 @@ func (wm *WordMatcher) AddWord(word string) error {
 			return wm.words[idx][i] == chars[i]
 		}
 
-		indices = us.SliceFilter(indices, filter)
+		indices = gcslc.SliceFilter(indices, filter)
 	}
 
 	if len(indices) == 0 {

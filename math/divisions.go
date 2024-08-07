@@ -4,7 +4,7 @@ import (
 	"math/big"
 
 	gcers "github.com/PlayerR9/go-commons/errors"
-	luc "github.com/PlayerR9/lib_units/common"
+	gcint "github.com/PlayerR9/go-commons/ints"
 )
 
 // PrimeFactorization is a function that performs prime factorization on an
@@ -121,14 +121,14 @@ func BigFloatDivision(numerator, denominator int) (*big.Float, error) {
 	if numerator < 0 {
 		return new(big.Float), gcers.NewErrInvalidParameter(
 			"numerator",
-			luc.NewErrGTE(0),
+			gcint.NewErrGTE(0),
 		)
 	}
 
 	if denominator <= 0 {
 		return new(big.Float), gcers.NewErrInvalidParameter(
 			"denominator",
-			luc.NewErrGT(0),
+			gcint.NewErrGT(0),
 		)
 	}
 
